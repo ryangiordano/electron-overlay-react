@@ -1,0 +1,18 @@
+{
+  "name": "electron-overlay-react",
+  "productName": "electron-overlay-react",
+  "version": "0.0.1",
+  "description": "Electron Overlay Application",
+  "main": "./main.prod.js",
+  "author": {
+    "name": "Ryan Giordano",
+    "email": "rgiorda1@gmail.com",
+    "url": "https://github.com/thedaruma"
+  },
+  "scripts": {
+    "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
+    "postinstall": "yarn electron-rebuild"
+  },
+  "license": "MIT",
+  "dependencies": {}
+}

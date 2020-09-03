@@ -2,7 +2,6 @@
   "env": {
     "jest/globals": true
   },
-  "plugins": ["jest", "testcafe"],
   "rules": {
     "jest/no-focused-tests": "error",
     "jest/no-identical-title": "error",

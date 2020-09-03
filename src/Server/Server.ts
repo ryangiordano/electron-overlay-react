@@ -1,11 +1,24 @@
-import * as express from "express";
+import express from "express";
 import * as bodyParser from "body-parser";
 import * as path from "path";
-import * as cors from "cors";
+import cors from "cors";
 import SlackController from "./Controllers/SlackController";
-
+import { createEventAdapter } from "@slack/events-api";
+import { Slack } from "./Services/Slack";
+const port = 5000;
 export const createServer = () => {
   const expressApp = express();
+
+  // const slackController = new SlackController();
+  // expressApp.use("/api", slackController.router);
+  const secret = process?.env?.SLACK_SIGNING_SECRET;
+
+  const slack = secret ? new Slack(secret) : null;
+  if (slack) {
+    expressApp.use("/slack", slack.getRequestListener());
+    slack.initialize();
+  }
+
   expressApp.use(bodyParser.json());
   expressApp.use(
     bodyParser.urlencoded({
@@ -40,10 +53,7 @@ export const createServer = () => {
     next();
   });
 
-  const slackController = new SlackController();
-  expressApp.use("/api", slackController.router);
-
-  expressApp.listen(5000, () => {
+  expressApp.listen(port, () => {
     console.log("Listening on 5000");
   });
 };

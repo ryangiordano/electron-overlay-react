@@ -1,6 +1,9 @@
 import * as express from "express";
 import SlackContext from "../Contexts/SlackContext";
 
+/**
+ * For authenticating with slack, getting values such as users and custom emojis from slack.
+ */
 export default class SlackController {
   public path = "/slack";
   public router = express.Router();
@@ -12,8 +15,9 @@ export default class SlackController {
   }
 
   public intializeRoutes() {
-    this.router.get(`${this.path}/`, (request, response) => {
-      return response.send("Great");
+    this.router.post(`${this.path}/`, (request, response) => {
+      console.log(request.body.challenge);
+      return response.send(request.body.challenge);
     });
   }
 }

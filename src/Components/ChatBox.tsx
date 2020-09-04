@@ -55,14 +55,6 @@ class ChatBox extends React.Component<ChatboxProps, ChatboxState> {
     }
   }
 
-  private splice(string: string, index: number, count: number, add?: string) {
-    if (index < 0) {
-      index += string.length;
-      if (index < 0) index = 0;
-    }
-    return string.slice(0, index) + (add || "") + string.slice(index + count);
-  }
-
   private emojifyMessage(message: string): JSX.Element {
     const { emojis, quoraEmojis } = this.props.context;
     let tempMessage = message;

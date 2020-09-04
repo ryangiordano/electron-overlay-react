@@ -1,5 +1,4 @@
-import React, { useContext, createContext } from "react";
-import io from "socket.io-client";
+import React from "react";
 import debounce from "lodash/debounce";
 import EmojiImage from "../Components/EmojiImage";
 import { EmojiShortnameDict } from "../Shared/Emojis";
@@ -54,25 +53,51 @@ export default class QuoraAudience extends React.Component<
   }
 
   async componentDidMount() {
-    const response = await axios.get(
-      `${process.env.REACT_APP_ENDPOINT}/api/register_channel/${this.props.match.params.channelId}`
-    );
-    const socket = io();
-    socket.on("message", (message: string) => {
-      console.log(`message event: ${message}`);
-    });
-    socket.on("slack event", (data: any) => {
-      console.log(`slack event: ${JSON.stringify(data)}`);
-      switch (data.type) {
-        case "reaction_added":
-          data.reaction && this.addReaction(data.reaction);
-          break;
-        case "message":
-          data.text && data.user && this.addMessage(data.text, data.user);
-          break;
+    // const response = await axios.get(
+    //   `${process.env.REACT_APP_ENDPOINT}/api/register_channel/${this.props.match.params.channelId}`
+    // );
+    // const socket = io();
+    // socket.on("message", (message: string) => {
+    //   console.log(`message event: ${message}`);
+    // });
+    // socket.on("slack event", (data: any) => {
+    //   console.log(`slack event: ${JSON.stringify(data)}`);
+    //   switch (data.type) {
+    //     case "reaction_added":
+    //       data.reaction && this.addReaction(data.reaction);
+    //       break;
+    //     case "message":
+    //       data.text && data.user && this.addMessage(data.text, data.user);
+    //       break;
+    //   }
+    // });
+    // socket.emit("join", window.slack_channel || response.data);\
+
+    const ws = new WebSocket("ws://localhost:5003/", "echo-protocol");
+
+    ws.onerror = function () {
+      console.log("Connection Error");
+    };
+
+    ws.onopen = function () {
+      console.log("WebSocket Client Connected");
+    };
+
+    ws.onclose = function () {
+      console.log("echo-protocol Client Closed");
+    };
+
+    ws.onmessage = (e) => {
+      if (typeof e.data === "string") {
+        console.log("Received: '" + e.data + "'");
+      } else {
+        this.addReaction("smiley");
+        console.log(e.data);
       }
-    });
-    socket.emit("join", window.slack_channel || response.data);
+    };
+
+    console.log(process.env.REACT_APP_ENDPOINT);
+
     // TODO(rgiordano): Cache this
     const emojis = await axios.get(
       `${process.env.REACT_APP_ENDPOINT}/api/emoji_list`
@@ -130,7 +155,9 @@ export default class QuoraAudience extends React.Component<
           // Channel mentions will start with "#".
           prefix = "#";
         }
-        return `${formatType === "#" ? "#" : formatType === undefined ? "" : "@"}${label}`;
+        return `${
+          formatType === "#" ? "#" : formatType === undefined ? "" : "@"
+        }${label}`;
       }
       switch (formatType) {
         case "@": {

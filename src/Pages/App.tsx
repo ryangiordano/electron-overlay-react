@@ -7,6 +7,5 @@ type Props = {
 export default function App(props: Props) {
   const { children } = props;
 
-
   return <>{children}</>;
 }

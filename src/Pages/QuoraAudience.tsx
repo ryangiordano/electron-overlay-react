@@ -90,9 +90,10 @@ export default class QuoraAudience extends React.Component<
     ws.onmessage = (e) => {
       if (typeof e.data === "string") {
         console.log("Received: '" + e.data + "'");
-      } else {
         this.addReaction("smiley");
-        console.log(e.data);
+
+      } else {
+        console.log(JSON.parse(e.data));
       }
     };
 
@@ -117,14 +118,14 @@ export default class QuoraAudience extends React.Component<
 
   private addReaction(reaction: string) {
     const key = reaction;
-    const emoji = this.emojis[key] ? (
-      <EmojiImage src={this.emojis[key]} />
-    ) : this.isSlackEmoji(key) ? (
-      emojiFromUnicodeReaction(reaction)
-    ) : (
-      <EmojiImage src={this.emojis["slowpoke"]} />
-    );
-
+    // const emoji = this.emojis[key] ? (
+    //   <EmojiImage src={this.emojis[key]} />
+    // ) : this.isSlackEmoji(key) ? (
+    //   emojiFromUnicodeReaction(reaction)
+    // ) : (
+    //   <EmojiImage src={this.emojis["slowpoke"]} />
+    // );
+    const emoji = emojiFromUnicodeReaction(reaction);
     this.setState((prevState) => {
       const count = prevState.reactionCount + 1;
       return {

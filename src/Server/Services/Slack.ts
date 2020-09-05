@@ -1,13 +1,13 @@
-import { createEventAdapter } from "@slack/events-api";
-import SlackEventAdapter from "@slack/events-api/dist/adapter";
+import { RTMClient } from "@slack/rtm-api";
 import { Server } from "ws";
 
 export class Slack {
-  private slackEvents: SlackEventAdapter;
+  private slackEvents: RTMClient;
   private wss: Server;
   private clientSocket: any;
   constructor(token: string) {
-    this.slackEvents = createEventAdapter(token);
+    console.log(token);
+    this.slackEvents = new RTMClient(token);
     this.wss = new Server({
       port: 5003,
       perMessageDeflate: {
@@ -42,37 +42,33 @@ export class Slack {
   }
 
   public async initialize() {
+    console.log(this.slackEvents);
     this.slackEvents.on("reaction_added", (d) => this.handleReactionAdded(d));
 
     this.slackEvents.on("message", (d) => this.handleMessage(d));
 
     this.slackEvents.on("user_change", (d) => this.handleUserChange(d));
-    await this.slackEvents.start(5001);
-    console.log(`Listening for events on ${5001}`);
+    await this.slackEvents.start();
   }
 
   private handleReactionAdded(data: any) {
     console.log(data);
     if (this.clientSocket) {
-      this.clientSocket.send(data);
+      this.clientSocket.send(JSON.stringify(data));
     }
   }
 
   private handleMessage(data: any) {
     console.log(data);
     if (this.clientSocket) {
-      this.clientSocket.send(data);
+      this.clientSocket.send(JSON.stringify(data));
     }
   }
 
   private handleUserChange(data: any) {
     console.log(data);
     if (this.clientSocket) {
-      this.clientSocket.send(data);
+      this.clientSocket.send(JSON.stringify(data));
     }
-  }
-
-  public getRequestListener() {
-    return this.slackEvents.requestListener();
   }
 }

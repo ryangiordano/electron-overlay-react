@@ -15,7 +15,7 @@ import { app, BrowserWindow } from "electron";
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import MenuBuilder from "./menu";
-import { createServer } from './Server/Server';
+import { createServer } from "./Server/Server";
 
 export default class AppUpdater {
   constructor() {
@@ -43,7 +43,6 @@ if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
-
 const installExtensions = async () => {
   const installer = require("electron-devtools-installer");
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -66,15 +65,20 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    transparent: true,
+    frame: false,
+    devTools: false,
     webPreferences:
       (process.env.NODE_ENV === "development" ||
         process.env.E2E_BUILD === "true") &&
       process.env.ERB_SECURE !== "true"
         ? {
             nodeIntegration: true,
+            devTools: false,
           }
         : {
             preload: path.join(__dirname, "dist/renderer.prod.js"),
+            devTools: false,
           },
   });
 
@@ -122,6 +126,7 @@ if (process.env.E2E_BUILD === "true") {
   // eslint-disable-next-line promise/catch-or-return
   app.whenReady().then(() => {
     createWindow();
+    createServer();
   });
 } else {
   app.on("ready", () => {

@@ -11,11 +11,12 @@ export const createServer = () => {
 
   // const slackController = new SlackController();
   // expressApp.use("/api", slackController.router);
-  const secret = process?.env?.SLACK_SIGNING_SECRET;
+  const secret = process?.env?.SLACK_OAUTH_TOKEN;
 
   const slack = secret ? new Slack(secret) : null;
   if (slack) {
-    expressApp.use("/slack", slack.getRequestListener());
+    console.log("Initializing slack")
+    // expressApp.use("/slack", slack.getRequestListener());
     slack.initialize();
   }
 

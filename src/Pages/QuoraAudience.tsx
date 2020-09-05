@@ -89,15 +89,18 @@ export default class QuoraAudience extends React.Component<
 
     ws.onmessage = (e) => {
       if (typeof e.data === "string") {
-        console.log("Received: '" + e.data + "'");
-        this.addReaction("smiley");
+        const d = JSON.parse(e.data);
 
-      } else {
         console.log(JSON.parse(e.data));
+        if (d?.type === "reaction_added") {
+          this.addReaction(JSON.parse(e.data)?.reaction);
+        } else if (d?.type === "message") {
+          d.text && d.user && this.addMessage(d.text, d.user);
+          // this.addMessage(d.text, d.user);
+        }
+        // console.log(JSON.parse(e.data)?.reaction);
       }
     };
-
-    console.log(process.env.REACT_APP_ENDPOINT);
 
     // TODO(rgiordano): Cache this
     const emojis = await axios.get(
@@ -118,14 +121,14 @@ export default class QuoraAudience extends React.Component<
 
   private addReaction(reaction: string) {
     const key = reaction;
-    // const emoji = this.emojis[key] ? (
-    //   <EmojiImage src={this.emojis[key]} />
-    // ) : this.isSlackEmoji(key) ? (
-    //   emojiFromUnicodeReaction(reaction)
-    // ) : (
-    //   <EmojiImage src={this.emojis["slowpoke"]} />
-    // );
-    const emoji = emojiFromUnicodeReaction(reaction);
+    const emoji =
+      this.emojis && this.emojis[key] ? (
+        <EmojiImage src={this.emojis[key]} />
+      ) : this.isSlackEmoji(key) ? (
+        emojiFromUnicodeReaction(reaction)
+      ) : (
+        <EmojiImage src={this.emojis["slowpoke"]} />
+      );
     this.setState((prevState) => {
       const count = prevState.reactionCount + 1;
       return {
@@ -181,7 +184,7 @@ export default class QuoraAudience extends React.Component<
 
   private addMessage(content: string, uid: string) {
     const n = this.replaceSlackContent(content);
-    const userName = this.users[uid]?.name;
+    const userName = this.users ? this.users[uid]?.name : null;
     const prevState = this.state;
 
     prevState.messages.unshift({

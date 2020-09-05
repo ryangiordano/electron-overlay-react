@@ -16,7 +16,6 @@ export default class SlackController {
 
   public intializeRoutes() {
     this.router.post(`${this.path}/`, (request, response) => {
-      console.log(request.body.challenge);
       return response.send(request.body.challenge);
     });
   }

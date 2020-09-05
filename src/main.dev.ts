@@ -67,7 +67,6 @@ const createWindow = async () => {
     height: 728,
     transparent: true,
     frame: false,
-    devTools: false,
     webPreferences:
       (process.env.NODE_ENV === "development" ||
         process.env.E2E_BUILD === "true") &&

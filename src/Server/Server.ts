@@ -2,8 +2,6 @@ import express from "express";
 import * as bodyParser from "body-parser";
 import * as path from "path";
 import cors from "cors";
-import SlackController from "./Controllers/SlackController";
-import { createEventAdapter } from "@slack/events-api";
 import { Slack } from "./Services/Slack";
 const port = 5000;
 export const createServer = () => {
@@ -15,7 +13,6 @@ export const createServer = () => {
 
   const slack = secret ? new Slack(secret) : null;
   if (slack) {
-    console.log("Initializing slack")
     // expressApp.use("/slack", slack.getRequestListener());
     slack.initialize();
   }

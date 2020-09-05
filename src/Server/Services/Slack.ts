@@ -6,7 +6,6 @@ export class Slack {
   private wss: Server;
   private clientSocket: any;
   constructor(token: string) {
-    console.log(token);
     this.slackEvents = new RTMClient(token);
     this.wss = new Server({
       port: 5003,
@@ -42,7 +41,6 @@ export class Slack {
   }
 
   public async initialize() {
-    console.log(this.slackEvents);
     this.slackEvents.on("reaction_added", (d) => this.handleReactionAdded(d));
 
     this.slackEvents.on("message", (d) => this.handleMessage(d));
@@ -52,21 +50,18 @@ export class Slack {
   }
 
   private handleReactionAdded(data: any) {
-    console.log(data);
     if (this.clientSocket) {
       this.clientSocket.send(JSON.stringify(data));
     }
   }
 
   private handleMessage(data: any) {
-    console.log(data);
     if (this.clientSocket) {
       this.clientSocket.send(JSON.stringify(data));
     }
   }
 
   private handleUserChange(data: any) {
-    console.log(data);
     if (this.clientSocket) {
       this.clientSocket.send(JSON.stringify(data));
     }

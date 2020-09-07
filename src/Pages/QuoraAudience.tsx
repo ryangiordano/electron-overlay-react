@@ -8,11 +8,13 @@ import axios from "axios";
 import parse from "html-react-parser";
 import { RouteComponentProps } from "react-router-dom";
 import QuoraAudienceContext from "../Shared/QuoraAudienceContext";
+import { FullScreenContext } from "../Components/FullScreenContext/FullScreenContext";
 
 export interface QuoraAudienceState {
   reactions: any[];
   messages: any[];
   reactionCount: number;
+  fullScreenMode: boolean;
 }
 
 interface QuoraAudienceProps {
@@ -48,6 +50,7 @@ export default class QuoraAudience extends React.Component<
     this.state = {
       reactions: [],
       messages: [],
+      fullScreenMode: false,
       reactionCount: 0,
     };
   }
@@ -206,17 +209,31 @@ export default class QuoraAudience extends React.Component<
 
   render() {
     return (
-      <QuoraAudienceContext.Provider
-        value={{ emojis: EmojiShortnameDict, quoraEmojis: this.emojis }}
-      >
-        <AudienceStage
-          reactions={this.state.reactions}
-          onRemove={() => {
-            this.clearReactions();
-          }}
-          messages={this.state.messages}
-        />
-      </QuoraAudienceContext.Provider>
+      <FullScreenContext.Consumer>
+        {({ toggleFullScreen, fullScreenMode }) => (
+          <QuoraAudienceContext.Provider
+            value={{ emojis: EmojiShortnameDict, quoraEmojis: this.emojis }}
+          >
+            {!fullScreenMode ? (
+              <button
+                onClick={() => {
+                  toggleFullScreen();
+                  // this.toggleFullScreenMode(!this.state.fullScreenMode);
+                }}
+              >
+                Click me
+              </button>
+            ) : null}
+            <AudienceStage
+              reactions={this.state.reactions}
+              onRemove={() => {
+                this.clearReactions();
+              }}
+              messages={this.state.messages}
+            />
+          </QuoraAudienceContext.Provider>
+        )}
+      </FullScreenContext.Consumer>
     );
   }
 }

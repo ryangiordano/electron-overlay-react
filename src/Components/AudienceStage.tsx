@@ -15,11 +15,12 @@ const AudienceStage = ({
     <div
       style={{
         display: "flex",
-        height: "100vh",
-        width: "100vw",
+        height: "96vh",
+        width: "99vw",
         alignContent: "center",
         flexDirection: "column",
-        backgroundColor: "rgba(0,0,0,0)",
+        overflowX: "hidden",
+        overflowY: "hidden",
       }}
     >
       <div

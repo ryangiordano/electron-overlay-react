@@ -260,6 +260,7 @@
     "@hot-loader/react-dom": "^16.13.0",
     "@reduxjs/toolkit": "^1.4.0",
     "@slack/rtm-api": "^5.0.5",
+    "@types/animejs": "^3.1.2",
     "@types/cors": "^2.8.7",
     "@types/express": "^4.17.7",
     "@types/websocket": "^1.0.1",

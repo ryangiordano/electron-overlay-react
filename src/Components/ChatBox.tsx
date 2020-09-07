@@ -122,7 +122,7 @@ class ChatBox extends React.Component<ChatboxProps, ChatboxState> {
             flexDirection: "column",
             maxWidth: "70vw",
             backgroundColor: "rgba(0,0,0,.8)",
-            borderTopRightRadius: "15px",
+            borderRadius: "15px",
             transition: "opcity 5s",
             opacity: 1,
             position: "absolute",

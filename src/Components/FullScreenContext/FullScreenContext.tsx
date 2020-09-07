@@ -5,7 +5,9 @@ type FullScreenContextType = {
   fullScreenMode: boolean;
   toggleFullScreen: () => void;
 };
-
+/**
+ * Context for managing setting the app to full screen mode and back.
+ */
 export const FullScreenContext = React.createContext<FullScreenContextType>({
   fullScreenMode: false,
   toggleFullScreen: () => {},
@@ -15,6 +17,11 @@ interface FullScreenProviderProps {
   children: ReactNode;
 }
 
+/**
+ * If in full screen mode, Electron will stop recording mouse events
+ * and the window will be set to the top of the stack.
+ * @param fullScreenMode
+ */
 const fullScreenModeSetter = (fullScreenMode: boolean) => {
   const w = electron.remote.getCurrentWindow();
   w.setFullScreen(!fullScreenMode);
@@ -24,12 +31,14 @@ const fullScreenModeSetter = (fullScreenMode: boolean) => {
 
 const setAlwaysOnTop = (fullScreenMode: boolean) => {
   const w = electron.remote.getCurrentWindow();
-
   setTimeout(() => {
-    w.setAlwaysOnTop(!fullScreenMode, "screen-saver");
-  }, 5);
+    w.setAlwaysOnTop(fullScreenMode, "screen-saver");
+  }, 100);
 };
 
+/**
+ * Provider for managing setting the app to full screen mode and back.
+ */
 export const FullScreenProvider = ({ children }: FullScreenProviderProps) => {
   const w = electron.remote.getCurrentWindow();
   const [fullScreenMode, setFullScreenMode] = useState(w.isFullScreen());

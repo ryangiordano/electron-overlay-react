@@ -3,17 +3,14 @@ import * as bodyParser from "body-parser";
 import * as path from "path";
 import cors from "cors";
 import { Slack } from "./Services/Slack";
+import SlackController from "./Controllers/SlackController";
 const port = 5000;
 export const createServer = () => {
   const expressApp = express();
-
-  // const slackController = new SlackController();
-  // expressApp.use("/api", slackController.router);
-  const secret = process?.env?.SLACK_OAUTH_TOKEN;
+  const secret = process?.env?.SLACK_BOT_USER_OAUTH_TOKEN;
 
   const slack = secret ? new Slack(secret) : null;
   if (slack) {
-    // expressApp.use("/slack", slack.getRequestListener());
     slack.initialize();
   }
 
@@ -26,9 +23,9 @@ export const createServer = () => {
   // Serve the static files from the React expressApp
   expressApp.use(express.static(path.join(__dirname, "client/")));
 
-  // ===================================
-  // CORS
-  // ===================================
+  // // ===================================
+  // // CORS
+  // // ===================================
   if (process.env.NODE_ENV === "production") {
     expressApp.use(cors());
   } else {
@@ -51,7 +48,10 @@ export const createServer = () => {
     next();
   });
 
+  const slackController = new SlackController();
+  expressApp.use("/api", slackController.router);
+
   expressApp.listen(port, () => {
-    console.log("Listening on 5000");
+    console.log(`Listening on port ${port}`);
   });
 };

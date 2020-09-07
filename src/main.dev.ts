@@ -102,9 +102,8 @@ const createWindow = async () => {
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
-  const menu = menuBuilder.buildMenu();
+  menuBuilder.buildMenu();
   globalShortcut.register("Esc", () => {
-    console.log("CommandOrControl+X is pressed");
     mainWindow?.setFullScreen(false);
     mainWindow?.setIgnoreMouseEvents(false);
   });

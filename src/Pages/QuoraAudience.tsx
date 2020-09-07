@@ -3,12 +3,12 @@ import debounce from "lodash/debounce";
 import EmojiImage from "../Components/EmojiImage";
 import { EmojiShortnameDict } from "../Shared/Emojis";
 import AudienceStage from "../Components/AudienceStage";
-import axios from "axios";
 
 import parse from "html-react-parser";
 import { RouteComponentProps } from "react-router-dom";
 import QuoraAudienceContext from "../Shared/QuoraAudienceContext";
 import { FullScreenContext } from "../Components/FullScreenContext/FullScreenContext";
+import SlackService from "../Services/SlackService";
 
 export interface QuoraAudienceState {
   reactions: any[];
@@ -45,6 +45,7 @@ export default class QuoraAudience extends React.Component<
 > {
   private emojis: any;
   private users: any;
+  private slackService: SlackService;
   constructor(props: any) {
     super(props);
     this.state = {
@@ -53,6 +54,7 @@ export default class QuoraAudience extends React.Component<
       fullScreenMode: false,
       reactionCount: 0,
     };
+    this.slackService = new SlackService();
   }
 
   async componentDidMount() {
@@ -93,28 +95,20 @@ export default class QuoraAudience extends React.Component<
     ws.onmessage = (e) => {
       if (typeof e.data === "string") {
         const d = JSON.parse(e.data);
-
-        console.log(JSON.parse(e.data));
         if (d?.type === "reaction_added") {
           this.addReaction(JSON.parse(e.data)?.reaction);
         } else if (d?.type === "message") {
           d.text && d.user && this.addMessage(d.text, d.user);
-          // this.addMessage(d.text, d.user);
         }
-        // console.log(JSON.parse(e.data)?.reaction);
       }
     };
 
     // TODO(rgiordano): Cache this
-    const emojis = await axios.get(
-      `${process.env.REACT_APP_ENDPOINT}/api/emoji_list`
-    );
-    this.emojis = emojis?.data;
+    const emojis = await this.slackService.getEmojis();
+    this.emojis = emojis;
     // TODO(rgiordano): Cache this
-    const users = await axios.get(
-      `${process.env.REACT_APP_ENDPOINT}/api/user_list`
-    );
-    this.users = users?.data;
+    const users = await this.slackService.getUsers();
+    this.users = users;
   }
 
   private isSlackEmoji(key: string) {
@@ -124,6 +118,8 @@ export default class QuoraAudience extends React.Component<
 
   private addReaction(reaction: string) {
     const key = reaction;
+    console.log(key)
+    console.log(this.emojis)
     const emoji =
       this.emojis && this.emojis[key] ? (
         <EmojiImage src={this.emojis[key]} />

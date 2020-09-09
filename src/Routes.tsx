@@ -6,6 +6,7 @@ import App from "./Pages/App";
 import HomePage from "./Pages/HomePage";
 import QuoraAudience from "./Pages/QuoraAudience";
 import { Navbar } from "./Components/Navbar";
+import { FullScreenContext } from "./Components/FullScreenContext/FullScreenContext";
 
 // Lazily load routes and code split with webpack
 const LazyCounterPage = React.lazy(
@@ -21,15 +22,25 @@ const CounterPage = (props: Record<string, any>) => (
 export default function Routes() {
   return (
     <App>
-      <Router>
-        <Navbar />
-
-        <Switch>
-          <Route path={routes.COUNTER} component={CounterPage} />
-          <Route path={routes.CHANNEL} component={QuoraAudience} />
-          <Route path={routes.HOME} component={HomePage} />
-        </Switch>
-      </Router>
+      <FullScreenContext.Consumer>
+        {({ fullScreenMode }) => (
+          <div
+            style={{
+              backgroundColor: fullScreenMode ? "rgba(0,0,0,0)" : "#fff",
+              height: "100vh",
+            }}
+          >
+            <Router>
+              <Navbar />
+              <Switch>
+                <Route path={routes.COUNTER} component={CounterPage} />
+                <Route path={routes.CHANNEL} component={QuoraAudience} />
+                <Route path={routes.HOME} component={HomePage} />
+              </Switch>
+            </Router>
+          </div>
+        )}
+      </FullScreenContext.Consumer>
     </App>
   );
 }

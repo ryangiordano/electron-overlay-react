@@ -7,13 +7,16 @@ const Input = ({
   onChange,
   value,
   placeholder,
+  id,
 }: {
   onChange: any;
   value: string;
   placeholder?: string;
+  id?: string;
 }) => {
   return (
     <input
+      id={id}
       type="text"
       className="form-control"
       name="channel-name"
@@ -64,8 +67,16 @@ export default class ChooseChannel extends React.Component<any, any> {
           flexDirection: "column",
         }}
       >
+        <label
+          className="card-title"
+          htmlFor="channel-id"
+          style={{ fontSize: "1.5rem" }}
+        >
+          Channel to stream
+        </label>
         <div style={{ display: "flex" }}>
           <Input
+            id="channel-id"
             value={this.state.channelName}
             onChange={(e: any) => {
               this.setState(

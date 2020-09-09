@@ -21,4 +21,11 @@ export default class SlackService {
       : null;
     return response?.data?.emoji;
   }
+
+  async getChannel(channelName: string) {
+    const channel = this.endPoint
+      ? await axios.get(`${this.endPoint}/slack/channels/${channelName}`)
+      : null;
+    return channel?.data?.channel;
+  }
 }

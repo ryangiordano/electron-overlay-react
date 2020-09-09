@@ -19,9 +19,9 @@
 } */
 
 body {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.0);
   height:96vh;
-  width: 99vw;
+  width: 100vw;
   /* overflow: hidden; */
 }
 
@@ -33,9 +33,6 @@ h2 {
   color: #fff;
 }
 
-p {
-  font-size: 24px;
-}
 
 li {
   list-style: none;

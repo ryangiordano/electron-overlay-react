@@ -4,7 +4,7 @@ import { Server } from "ws";
 export class Slack {
   private slackEvents: RTMClient;
   private wss: Server;
-  private clientSocket: any;
+  private clientSockets: any = {};
   constructor(token: string) {
     this.slackEvents = new RTMClient(token);
     this.wss = new Server({
@@ -30,12 +30,17 @@ export class Slack {
       },
     });
     this.wss.on("connection", (ws) => {
-      this.clientSocket = ws;
-      ws.on("message", function incoming(message) {
-        console.log("received: %s", message);
+      ws.on("message", (event) => {
+        if (typeof event === "string") {
+          const e = JSON.parse(event);
+          if (e?.channel?.id) {
+            this.clientSockets[e.channel.id] = ws;
+          }
+        }
       });
+
       ws.on("close", () => {
-        console.log("ws closed");
+        this.clientSockets = {};
       });
     });
   }
@@ -50,20 +55,23 @@ export class Slack {
   }
 
   private handleReactionAdded(data: any) {
-    if (this.clientSocket) {
-      this.clientSocket.send(JSON.stringify(data));
+    const channelId = data?.item?.channel;
+    if (this.clientSockets[channelId]) {
+      this.clientSockets[channelId].send(JSON.stringify(data));
     }
   }
 
   private handleMessage(data: any) {
-    if (this.clientSocket) {
-      this.clientSocket.send(JSON.stringify(data));
+    const channelId = data?.item?.channel;
+    if (this.clientSockets[channelId]) {
+      this.clientSockets[channelId].send(JSON.stringify(data));
     }
   }
 
   private handleUserChange(data: any) {
-    if (this.clientSocket) {
-      this.clientSocket.send(JSON.stringify(data));
+    const channelId = data?.item?.channel;
+    if (this.clientSockets[channelId]) {
+      this.clientSockets[channelId].send(JSON.stringify(data));
     }
   }
 }

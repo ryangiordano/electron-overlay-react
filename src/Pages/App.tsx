@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { FullScreenProvider } from "../Components/FullScreenContext/FullScreenContext";
+import { Navbar } from "../Components/Navbar";
 
 type Props = {
   children: ReactNode;
@@ -8,5 +9,9 @@ type Props = {
 export default function App(props: Props) {
   const { children } = props;
 
-  return <FullScreenProvider>{children}</FullScreenProvider>;
+  return (
+    <FullScreenProvider>
+      {children}
+    </FullScreenProvider>
+  );
 }

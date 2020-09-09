@@ -1,5 +1,5 @@
 {
   "HOME": "/",
   "COUNTER": "/counter",
-  "CHANNEL": "/channel"
+  "CHANNEL": "/channel/:channelId"
 }

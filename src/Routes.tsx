@@ -5,6 +5,7 @@ import routes from "./constants/routes.json";
 import App from "./Pages/App";
 import HomePage from "./Pages/HomePage";
 import QuoraAudience from "./Pages/QuoraAudience";
+import { Navbar } from "./Components/Navbar";
 
 // Lazily load routes and code split with webpack
 const LazyCounterPage = React.lazy(
@@ -21,6 +22,8 @@ export default function Routes() {
   return (
     <App>
       <Router>
+        <Navbar />
+
         <Switch>
           <Route path={routes.COUNTER} component={CounterPage} />
           <Route path={routes.CHANNEL} component={QuoraAudience} />

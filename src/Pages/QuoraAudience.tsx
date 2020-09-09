@@ -7,7 +7,6 @@ import AudienceStage from "../Components/AudienceStage";
 import parse from "html-react-parser";
 import { RouteComponentProps } from "react-router-dom";
 import QuoraAudienceContext from "../Shared/QuoraAudienceContext";
-import { FullScreenContext } from "../Components/FullScreenContext/FullScreenContext";
 import SlackService from "../Services/SlackService";
 
 export interface QuoraAudienceState {
@@ -58,26 +57,6 @@ export default class QuoraAudience extends React.Component<
   }
 
   async componentDidMount() {
-    // const response = await axios.get(
-    //   `${process.env.REACT_APP_ENDPOINT}/api/register_channel/${this.props.match.params.channelId}`
-    // );
-    // const socket = io();
-    // socket.on("message", (message: string) => {
-    //   console.log(`message event: ${message}`);
-    // });
-    // socket.on("slack event", (data: any) => {
-    //   console.log(`slack event: ${JSON.stringify(data)}`);
-    //   switch (data.type) {
-    //     case "reaction_added":
-    //       data.reaction && this.addReaction(data.reaction);
-    //       break;
-    //     case "message":
-    //       data.text && data.user && this.addMessage(data.text, data.user);
-    //       break;
-    //   }
-    // });
-    // socket.emit("join", window.slack_channel || response.data);\
-
     const ws = new WebSocket("ws://localhost:5003/", "echo-protocol");
 
     ws.onerror = function () {
@@ -109,6 +88,13 @@ export default class QuoraAudience extends React.Component<
     // TODO(rgiordano): Cache this
     const users = await this.slackService.getUsers();
     this.users = users;
+
+    const channel = await this.slackService.getChannel(
+      this.props.match.params.channelId
+    );
+
+    //TODO: Catch potential error here;
+    ws.send(JSON.stringify({ channel }));
   }
 
   private isSlackEmoji(key: string) {
@@ -118,8 +104,6 @@ export default class QuoraAudience extends React.Component<
 
   private addReaction(reaction: string) {
     const key = reaction;
-    console.log(key)
-    console.log(this.emojis)
     const emoji =
       this.emojis && this.emojis[key] ? (
         <EmojiImage src={this.emojis[key]} />
@@ -183,9 +167,10 @@ export default class QuoraAudience extends React.Component<
 
   private addMessage(content: string, uid: string) {
     const n = this.replaceSlackContent(content);
-    const userName = this.users ? this.users[uid]?.name : null;
+    const userName = this.users
+      ? this.users.find((u: any) => u.id === uid)?.name
+      : null;
     const prevState = this.state;
-
     prevState.messages.unshift({
       key: `${Date.now() / 100}`,
       content: userName ? `${userName}: ${n}` : n,
@@ -205,31 +190,17 @@ export default class QuoraAudience extends React.Component<
 
   render() {
     return (
-      <FullScreenContext.Consumer>
-        {({ toggleFullScreen, fullScreenMode }) => (
-          <QuoraAudienceContext.Provider
-            value={{ emojis: EmojiShortnameDict, quoraEmojis: this.emojis }}
-          >
-            {!fullScreenMode ? (
-              <button
-                onClick={() => {
-                  toggleFullScreen();
-                  // this.toggleFullScreenMode(!this.state.fullScreenMode);
-                }}
-              >
-                Click me
-              </button>
-            ) : null}
-            <AudienceStage
-              reactions={this.state.reactions}
-              onRemove={() => {
-                this.clearReactions();
-              }}
-              messages={this.state.messages}
-            />
-          </QuoraAudienceContext.Provider>
-        )}
-      </FullScreenContext.Consumer>
+      <QuoraAudienceContext.Provider
+        value={{ emojis: EmojiShortnameDict, quoraEmojis: this.emojis }}
+      >
+        <AudienceStage
+          reactions={this.state.reactions}
+          onRemove={() => {
+            this.clearReactions();
+          }}
+          messages={this.state.messages}
+        />
+      </QuoraAudienceContext.Provider>
     );
   }
 }

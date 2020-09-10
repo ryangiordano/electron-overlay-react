@@ -17,6 +17,11 @@ import log from "electron-log";
 import MenuBuilder from "./menu";
 import { createServer } from "./Server/Server";
 
+const screenSize = {
+  width: 1024,
+  height: 728,
+};
+
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = "info";
@@ -63,8 +68,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: screenSize.width,
+    height: screenSize.height,
     transparent: true,
     frame: false,
     webPreferences:
@@ -104,6 +109,13 @@ const createWindow = async () => {
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
   globalShortcut.register("Esc", () => {
+    console.log(mainWindow?.isFullScreen());
+    console.log(mainWindow?.fullScreenable);
+
+    // mainWindow?.setSize(screenSize.width, screenSize.height);
+    // mainWindow?.setMinimizable(false);
+    // mainWindow?.setPosition(0, 0);
+    // mainWindow?.setSkipTaskbar(false)
     mainWindow?.setFullScreen(false);
     mainWindow?.setIgnoreMouseEvents(false);
   });

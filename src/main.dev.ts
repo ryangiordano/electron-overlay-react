@@ -49,13 +49,12 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const installExtensions = async () => {
-  const installer = require("electron-devtools-installer");
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ["REACT_DEVELOPER_TOOLS", "REDUX_DEVTOOLS"];
-
-  return Promise.all(
-    extensions.map((name) => installer.default(installer[name], forceDownload))
-  ).catch(console.log);
+  // const installer = require("electron-devtools-installer");
+  // const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+  // const extensions = ["REACT_DEVELOPER_TOOLS", "REDUX_DEVTOOLS"];
+  // return Promise.all(
+  //   extensions.map((name) => installer.default(installer[name], forceDownload))
+  // ).catch(console.log);
 };
 
 const createWindow = async () => {
@@ -67,7 +66,6 @@ const createWindow = async () => {
   }
 
   mainWindow = new BrowserWindow({
-    show: false,
     width: screenSize.width,
     height: screenSize.height,
     transparent: true,
@@ -94,6 +92,13 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+    /**
+     * NB: Flashing fullscreen fixes a bug where toggling full screen
+     * off the first time shrinks the window to (0,0).
+     */
+    mainWindow.setFullScreen(true);
+    mainWindow.setFullScreen(false);
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
@@ -108,17 +113,17 @@ const createWindow = async () => {
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
-  globalShortcut.register("Esc", () => {
-    console.log(mainWindow?.isFullScreen());
-    console.log(mainWindow?.fullScreenable);
 
-    // mainWindow?.setSize(screenSize.width, screenSize.height);
-    // mainWindow?.setMinimizable(false);
-    // mainWindow?.setPosition(0, 0);
-    // mainWindow?.setSkipTaskbar(false)
+  globalShortcut.register("F11", () => {
+    mainWindow?.setFullScreen(true);
+    mainWindow?.setIgnoreMouseEvents(true);
+  });
+
+  globalShortcut.register("Esc", () => {
     mainWindow?.setFullScreen(false);
     mainWindow?.setIgnoreMouseEvents(false);
   });
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -127,7 +132,6 @@ const createWindow = async () => {
 /**
  * Add event listeners...
  */
-
 app.on("window-all-closed", () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed

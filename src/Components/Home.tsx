@@ -3,6 +3,7 @@ import ChooseChannel from "./ChooseChannel";
 import Card from "../Patterns/Card";
 import ChatQueue from "./ChatQueue";
 import SlackService from "../Services/SlackService";
+import WebSocketComponent from "../Features/WebSocket";
 
 interface HomeProps {}
 
@@ -20,10 +21,10 @@ export class Home extends React.Component<HomeProps, HomeState> {
     };
   }
   componentDidMount() {
-    this.getUsers();
+    this.fetchUsers();
   }
 
-  private getUsers() {
+  private fetchUsers() {
     this.slackService.getUsers().then((u) => {
       if (u) {
         this.setState({
@@ -32,21 +33,49 @@ export class Home extends React.Component<HomeProps, HomeState> {
       }
     });
   }
+
+  private handleWebsocketMessage(event: SlackEvent) {
+    if (event?.type === "user_change") {
+      this.fetchUsers();
+    }
+  }
+
   render() {
     return (
-      <div className="container">
-        <Card header={"Streaming Reaction Overlay"} className="mt-3">
-          <ChooseChannel />
-        </Card>
-        <Card
-          header={
-            "Find others in the company who are looking for conversation partners"
+      <WebSocketComponent
+        url={"localhost:5003"}
+        onError={() => {
+          console.log("Connection Error");
+        }}
+        onOpen={() => {
+          console.log("WebSocket Client Connected");
+        }}
+        onClose={() => {
+          console.log("echo-protocol Client Closed");
+        }}
+        onMessage={(e) => {
+          if (typeof e.data === "string") {
+            const event: SlackEvent = JSON.parse(e.data);
+            this.handleWebsocketMessage(event);
           }
-          className="my-3"
-        >
-          <ChatQueue users={this.state.users} />
-        </Card>
-      </div>
+        }}
+      >
+        {() => (
+          <div className="container">
+            <Card header={"Streaming Reaction Overlay"} className="mt-3">
+              <ChooseChannel />
+            </Card>
+            <Card
+              header={
+                "Find others in the company who are looking for conversation partners"
+              }
+              className="my-3"
+            >
+              <ChatQueue users={this.state.users} />
+            </Card>
+          </div>
+        )}
+      </WebSocketComponent>
     );
   }
 }

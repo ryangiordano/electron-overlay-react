@@ -64,14 +64,18 @@ export default class QuoraAudience extends React.Component<
     const emojis = await this.slackService.getEmojis();
     this.emojis = emojis;
     // TODO(rgiordano): Cache this
-    const users = await this.slackService.getUsers();
-    this.users = users;
+    await this.fetchUsers();
 
     const channel = await this.slackService.getChannel(
       this.props.match.params.channelId
     );
 
     this.setState({ focusChannel: channel });
+  }
+
+  private async fetchUsers() {
+    const users = await this.slackService.getUsers();
+    this.users = users;
   }
 
   private isSlackEmoji(key: string) {
@@ -165,6 +169,23 @@ export default class QuoraAudience extends React.Component<
     this.setState({ reactions: [] });
   }, 15000);
 
+  private handleWebsocketMessage(event: SlackEvent) {
+    if (event?.type === "reaction_added") {
+      const channelId = event.item.channel;
+      this.state.focusChannel?.id === channelId
+        ? this.addReaction(event?.reaction)
+        : null;
+    }
+
+    if (event?.type === "message") {
+      const channelId = event.channel;
+      this.state.focusChannel?.id === channelId &&
+        event.text &&
+        event.user &&
+        this.addMessage(event.text, event.user);
+    }
+  }
+
   render() {
     return (
       <WebSocketComponent
@@ -180,22 +201,8 @@ export default class QuoraAudience extends React.Component<
         }}
         onMessage={(e) => {
           if (typeof e.data === "string") {
-            const d:
-              | SlackUserChangeEvent
-              | SlackReactEvent
-              | SlackMessageEvent = JSON.parse(e.data);
-            if (d?.type === "reaction_added") {
-              const channelId = d.item.channel;
-              this.state.focusChannel?.id === channelId
-                ? this.addReaction(d?.reaction)
-                : null;
-            } else if (d?.type === "message") {
-              const channelId = d.channel;
-              this.state.focusChannel?.id === channelId &&
-                d.text &&
-                d.user &&
-                this.addMessage(d.text, d.user);
-            }
+            const event: SlackEvent = JSON.parse(e.data);
+            this.handleWebsocketMessage(event);
           }
         }}
       >

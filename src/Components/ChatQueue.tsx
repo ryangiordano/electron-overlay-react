@@ -38,7 +38,7 @@ const ChatQueueList = ({
   header: string;
 }) => {
   return (
-    <ul className="list-group mr-2">
+    <ul className="list-group mr-2" style={{ flexGrow: 1 }}>
       <li className="list-group-item">
         <h1 style={{ fontSize: "1.2rem", margin: 0 }}>{header}</h1>
       </li>

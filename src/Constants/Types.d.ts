@@ -114,3 +114,8 @@ declare type SlackUser = {
   locale: string;
   profile: SlackUserProfile;
 };
+
+declare type SlackEvent =
+  | SlackUserChangeEvent
+  | SlackReactEvent
+  | SlackMessageEvent;

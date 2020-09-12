@@ -52,7 +52,7 @@ const ChatQueueList = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "1.1rem",
+            fontSize: "1rem",
           }}
         >
           Empty :(

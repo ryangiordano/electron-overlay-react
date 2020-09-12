@@ -28,11 +28,12 @@ export default function Routes() {
           <div
             style={{
               backgroundColor: fullScreenMode ? "rgba(0,0,0,0)" : "#fff",
-              height: "100vh",
+              height: "100%",
+              paddingBottom: "3rem",
             }}
           >
             <Router>
-              <div style={{ marginBottom: "4rem" }}>
+              <div style={{ paddingBottom: "4rem" }}>
                 <Navbar />
               </div>
               <Switch>

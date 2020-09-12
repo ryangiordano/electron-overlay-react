@@ -10,10 +10,11 @@ import QuoraAudienceContext from "../Shared/QuoraAudienceContext";
 import SlackService from "../Services/SlackService";
 
 export interface QuoraAudienceState {
-  reactions: any[];
-  messages: any[];
+  reactions: { emoji: JSX.Element; key: number }[];
+  messages: { key: string; content: string }[];
   reactionCount: number;
   fullScreenMode: boolean;
+  focusChannel: SlackChannel | null;
 }
 
 interface QuoraAudienceProps {
@@ -52,6 +53,7 @@ export default class QuoraAudience extends React.Component<
       messages: [],
       fullScreenMode: false,
       reactionCount: 0,
+      focusChannel: null,
     };
     this.slackService = new SlackService();
   }
@@ -73,11 +75,21 @@ export default class QuoraAudience extends React.Component<
 
     ws.onmessage = (e) => {
       if (typeof e.data === "string") {
-        const d = JSON.parse(e.data);
+        const d:
+          | SlackUserChangeEvent
+          | SlackReactEvent
+          | SlackMessageEvent = JSON.parse(e.data);
         if (d?.type === "reaction_added") {
-          this.addReaction(JSON.parse(e.data)?.reaction);
+          const channelId = d.item.channel;
+          this.state.focusChannel?.id === channelId
+            ? this.addReaction(d?.reaction)
+            : null;
         } else if (d?.type === "message") {
-          d.text && d.user && this.addMessage(d.text, d.user);
+          const channelId = d.channel;
+          this.state.focusChannel?.id === channelId &&
+            d.text &&
+            d.user &&
+            this.addMessage(d.text, d.user);
         }
       }
     };
@@ -93,8 +105,10 @@ export default class QuoraAudience extends React.Component<
       this.props.match.params.channelId
     );
 
+    this.setState({ focusChannel: channel });
+
     //TODO: Catch potential error here;
-    ws.send(JSON.stringify({ channel }));
+    // ws.send(JSON.stringify({ channel }));
   }
 
   private isSlackEmoji(key: string) {
@@ -186,7 +200,7 @@ export default class QuoraAudience extends React.Component<
 
   private clearReactions = debounce(() => {
     this.setState({ reactions: [] });
-  }, 5000);
+  }, 15000);
 
   render() {
     return (
@@ -195,9 +209,7 @@ export default class QuoraAudience extends React.Component<
       >
         <AudienceStage
           reactions={this.state.reactions}
-          onRemove={() => {
-            this.clearReactions();
-          }}
+          onRemove={() => this.clearReactions()}
           messages={this.state.messages}
         />
       </QuoraAudienceContext.Provider>

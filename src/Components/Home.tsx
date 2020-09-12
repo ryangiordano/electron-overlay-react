@@ -7,7 +7,7 @@ import SlackService from "../Services/SlackService";
 interface HomeProps {}
 
 interface HomeState {
-  users: any[];
+  users: SlackUser[];
 }
 
 export class Home extends React.Component<HomeProps, HomeState> {
@@ -20,6 +20,10 @@ export class Home extends React.Component<HomeProps, HomeState> {
     };
   }
   componentDidMount() {
+    this.getUsers();
+  }
+
+  private getUsers() {
     this.slackService.getUsers().then((u) => {
       if (u) {
         this.setState({
@@ -29,7 +33,6 @@ export class Home extends React.Component<HomeProps, HomeState> {
     });
   }
   render() {
-    console.log(this.state.users);
     return (
       <div className="container">
         <Card header={"Streaming Reaction Overlay"} className="mt-3">

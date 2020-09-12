@@ -32,7 +32,9 @@ export default function Routes() {
             }}
           >
             <Router>
-              <Navbar />
+              <div style={{ marginBottom: "4rem" }}>
+                <Navbar />
+              </div>
               <Switch>
                 <Route path={routes.LOGIN} component={LoginPage} />
                 <Route path={routes.CHANNEL} component={QuoraAudience} />

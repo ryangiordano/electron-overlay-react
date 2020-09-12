@@ -8,7 +8,15 @@ export const Navbar = () => {
       {({ toggleFullScreen, fullScreenMode }) => (
         <>
           {fullScreenMode ? null : (
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <nav
+              className="navbar navbar-expand-lg navbar-light bg-light"
+              style={{
+                position: "fixed",
+                top: 0,
+                width: "100%",
+                zIndex: 1000,
+              }}
+            >
               <ul
                 className="navbar-nav mr-auto w-100"
                 style={{ flexDirection: "row", display: "flex" }}

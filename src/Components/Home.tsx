@@ -44,15 +44,6 @@ export class Home extends React.Component<HomeProps, HomeState> {
     return (
       <WebSocketComponent
         url={"localhost:5003"}
-        onError={() => {
-          console.log("Connection Error");
-        }}
-        onOpen={() => {
-          console.log("WebSocket Client Connected");
-        }}
-        onClose={() => {
-          console.log("echo-protocol Client Closed");
-        }}
         onMessage={(e) => {
           if (typeof e.data === "string") {
             const event: SlackEvent = JSON.parse(e.data);

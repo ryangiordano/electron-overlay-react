@@ -22,9 +22,7 @@ export default class LoginPage extends React.Component<any, any> {
             console.log(`${process.env.REACT_APP_ENDPOINT}api/slack`);
             axios
               .get(`${process.env.REACT_APP_ENDPOINT}api/slack`)
-              .then((d) => {
-                console.log(d);
-              });
+              .then((d) => {});
           }}
         >
           Great

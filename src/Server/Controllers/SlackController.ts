@@ -17,8 +17,6 @@ export default class SlackController {
   public intializeRoutes() {
     this.router.get(`${this.path}/channels`, async (_request, response) => {
       const channels = await this.slackContext.getChannels();
-      console.log(channels);
-
       return response.send(channels);
     });
 
@@ -30,7 +28,6 @@ export default class SlackController {
         const channel = r.channels.find(
           (c: any) => c.id === identifier || c.name === identifier
         );
-        console.log(identifier, channel);
         if (channel) {
           return response.send({
             success: true,

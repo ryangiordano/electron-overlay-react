@@ -42,15 +42,27 @@ const ChatQueueList = ({
       <li className="list-group-item">
         <h1 style={{ fontSize: "1.2rem", margin: 0 }}>{header}</h1>
       </li>
-      {users.map((u) => (
-        <ChatQueueUser user={u} />
-      ))}
+      {users.length ? (
+        users.map((u) => <ChatQueueUser user={u} />)
+      ) : (
+        <li
+          className="list-group-item text-muted"
+          style={{
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "1.1rem",
+          }}
+        >
+          Empty :(
+        </li>
+      )}
     </ul>
   );
 };
 
 const ChatQueue = ({ users }: { users: SlackUser[] }) => {
-  console.log(users);
   const filteredUsers = users.reduce(
     (
       acc: {

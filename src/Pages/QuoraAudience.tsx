@@ -8,6 +8,7 @@ import parse from "html-react-parser";
 import { RouteComponentProps } from "react-router-dom";
 import QuoraAudienceContext from "../Shared/QuoraAudienceContext";
 import SlackService from "../Services/SlackService";
+import WebSocketComponent from "../Features/WebSocket";
 
 export interface QuoraAudienceState {
   reactions: { emoji: JSX.Element; key: number }[];
@@ -59,41 +60,6 @@ export default class QuoraAudience extends React.Component<
   }
 
   async componentDidMount() {
-    const ws = new WebSocket("ws://localhost:5003/", "echo-protocol");
-
-    ws.onerror = function () {
-      console.log("Connection Error");
-    };
-
-    ws.onopen = function () {
-      console.log("WebSocket Client Connected");
-    };
-
-    ws.onclose = function () {
-      console.log("echo-protocol Client Closed");
-    };
-
-    ws.onmessage = (e) => {
-      if (typeof e.data === "string") {
-        const d:
-          | SlackUserChangeEvent
-          | SlackReactEvent
-          | SlackMessageEvent = JSON.parse(e.data);
-        if (d?.type === "reaction_added") {
-          const channelId = d.item.channel;
-          this.state.focusChannel?.id === channelId
-            ? this.addReaction(d?.reaction)
-            : null;
-        } else if (d?.type === "message") {
-          const channelId = d.channel;
-          this.state.focusChannel?.id === channelId &&
-            d.text &&
-            d.user &&
-            this.addMessage(d.text, d.user);
-        }
-      }
-    };
-
     // TODO(rgiordano): Cache this
     const emojis = await this.slackService.getEmojis();
     this.emojis = emojis;
@@ -106,9 +72,6 @@ export default class QuoraAudience extends React.Component<
     );
 
     this.setState({ focusChannel: channel });
-
-    //TODO: Catch potential error here;
-    // ws.send(JSON.stringify({ channel }));
   }
 
   private isSlackEmoji(key: string) {
@@ -204,15 +167,50 @@ export default class QuoraAudience extends React.Component<
 
   render() {
     return (
-      <QuoraAudienceContext.Provider
-        value={{ emojis: EmojiShortnameDict, quoraEmojis: this.emojis }}
+      <WebSocketComponent
+        url={"localhost:5003"}
+        onError={() => {
+          console.log("Connection Error");
+        }}
+        onOpen={() => {
+          console.log("WebSocket Client Connected");
+        }}
+        onClose={() => {
+          console.log("echo-protocol Client Closed");
+        }}
+        onMessage={(e) => {
+          if (typeof e.data === "string") {
+            const d:
+              | SlackUserChangeEvent
+              | SlackReactEvent
+              | SlackMessageEvent = JSON.parse(e.data);
+            if (d?.type === "reaction_added") {
+              const channelId = d.item.channel;
+              this.state.focusChannel?.id === channelId
+                ? this.addReaction(d?.reaction)
+                : null;
+            } else if (d?.type === "message") {
+              const channelId = d.channel;
+              this.state.focusChannel?.id === channelId &&
+                d.text &&
+                d.user &&
+                this.addMessage(d.text, d.user);
+            }
+          }
+        }}
       >
-        <AudienceStage
-          reactions={this.state.reactions}
-          onRemove={() => this.clearReactions()}
-          messages={this.state.messages}
-        />
-      </QuoraAudienceContext.Provider>
+        {() => (
+          <QuoraAudienceContext.Provider
+            value={{ emojis: EmojiShortnameDict, quoraEmojis: this.emojis }}
+          >
+            <AudienceStage
+              reactions={this.state.reactions}
+              onRemove={() => this.clearReactions()}
+              messages={this.state.messages}
+            />
+          </QuoraAudienceContext.Provider>
+        )}
+      </WebSocketComponent>
     );
   }
 }

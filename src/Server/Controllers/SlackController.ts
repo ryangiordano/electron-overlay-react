@@ -23,22 +23,9 @@ export default class SlackController {
     this.router.get(
       `${this.path}/channels/:channelId`,
       async (request, response) => {
-        const r: any = await this.slackContext.getChannels();
-        const identifier = request.params.channelId;
-        const channel = r.channels.find(
-          (c: any) => c.id === identifier || c.name === identifier
-        );
-        if (channel) {
-          return response.send({
-            success: true,
-            channel,
-          });
-        } else {
-          return response.send({
-            error: "This channel does not exist.",
-            success: false,
-          });
-        }
+        const channelIdentifier = request.params.channelId;
+        const responseObject = await this.getChannel(channelIdentifier);
+        response.send(responseObject);
       }
     );
 
@@ -51,5 +38,70 @@ export default class SlackController {
       const emoji = await this.slackContext.getCustomEmojis();
       return response.send(emoji);
     });
+
+    this.router.get(
+      `${this.path}/local-credentials`,
+      async (_request, response) => {
+        const credentials = this.getLocalCredentials();
+        response.send(credentials);
+      }
+    );
+
+    this.router.post(
+      `${this.path}/local-credentials`,
+      async (request, response) =>
+        await this.setLocalCredentials(request, response)
+    );
+
+    this.router.get(
+      `${this.path}/has-valid-tokens`,
+      async (_request, response) => {
+        const hasValidTokens = await this.hasValidTokens();
+        response.send(hasValidTokens);
+      }
+    );
+  }
+
+  private async getChannel(channelIdentifier: string) {
+    const r: any = await this.slackContext.getChannels();
+    const channel = r?.channels.find(
+      (c: any) => c.id === channelIdentifier || c.name === channelIdentifier
+    );
+    if (channel) {
+      return {
+        success: true,
+        channel,
+      };
+    } else {
+      return {
+        error: "This channel does not exist.",
+        success: false,
+      };
+    }
+  }
+
+  private async getLocalCredentials() {
+    const slackbotToken = await this.slackContext.getSlackBotUserOauthToken();
+    const slackUserToken = await this.slackContext.getSlackUserOauthToken();
+    const credentials = { slackbotToken, slackUserToken };
+    return credentials;
+  }
+
+  private async setLocalCredentials(request: any, response: any) {
+    try {
+      await this.slackContext.setSlackUserOauthToken(
+        request.body.slackUserToken
+      );
+      await this.slackContext.setSlackBotUserOauthToken(
+        request.body.slackbotToken
+      );
+    } catch (err) {
+      return response.send({ error: err, success: false });
+    }
+    return response.send({ success: true });
+  }
+
+  private async hasValidTokens() {
+    return await this.slackContext.hasValidTokens();
   }
 }

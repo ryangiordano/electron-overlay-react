@@ -2,30 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { debounce } from "lodash";
 import axios from "axios";
-
-const Input = ({
-  onChange,
-  value,
-  placeholder,
-  id,
-}: {
-  onChange: any;
-  value: string;
-  placeholder?: string;
-  id?: string;
-}) => {
-  return (
-    <input
-      id={id}
-      type="text"
-      className="form-control"
-      name="channel-name"
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-    />
-  );
-};
+import TextInput from "../Patterns/Forms/TextInput";
 
 export default class ChooseChannel extends React.Component<any, any> {
   constructor(props: any) {
@@ -75,7 +52,7 @@ export default class ChooseChannel extends React.Component<any, any> {
           Channel to stream
         </label>
         <div style={{ display: "flex" }}>
-          <Input
+          <TextInput
             id="channel-id"
             value={this.state.channelName}
             onChange={(e: any) => {
@@ -90,7 +67,7 @@ export default class ChooseChannel extends React.Component<any, any> {
           />
           <NavLink
             to={`/channel/${this.state.channelName}`}
-            className={`btn btn-primary ${
+            className={`btn btn-info ${
               this.state.validChannel ? "" : "disabled"
             }`}
             activeClassName="active"

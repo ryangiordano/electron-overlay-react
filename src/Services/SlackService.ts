@@ -28,4 +28,25 @@ export default class SlackService {
       : null;
     return channel?.data?.channel;
   }
+
+  /**
+   * Confirms whether the user has registered valid
+   * tokens with the application yet
+   */
+  async hasValidTokens() {
+    const valid = this.endPoint
+      ? await axios.get(`${this.endPoint}/slack/has-valid-tokens`)
+      : null;
+    return Boolean(valid?.data);
+  }
+
+  async registerTokens(botToken: string, userToken: string) {
+    const response = this.endPoint
+      ? await axios.post(`${this.endPoint}/slack/local-credentials`, {
+          slackUserToken: userToken,
+          slackbotToken: botToken,
+        })
+      : null;
+    return Boolean(response?.data?.success);
+  }
 }

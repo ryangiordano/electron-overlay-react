@@ -99,6 +99,7 @@ const createWindow = async () => {
     mainWindow.setFullScreen(true);
     mainWindow.setFullScreen(false);
 
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {

@@ -64,6 +64,19 @@ export class Home extends React.Component<HomeProps, HomeState> {
             >
               <ChatQueue users={this.state.users} />
             </Card>
+            <Card header={"Re-register your slackbot tokens."}>
+              {/* {location.pathname === routes.REGISTER ||
+                location.pathname.includes("/channel/") ? null : (
+                  <li className="nav-item active">
+                    <NavLink to={"/register"} className="btn btn-info">
+                      Register
+                    </NavLink>
+                  </li>
+                )} */}
+
+              <button className="btn btn-info mr-2">Re-register</button>
+              <button className="btn btn-info">Reset</button>
+            </Card>
           </div>
         )}
       </WebSocketComponent>

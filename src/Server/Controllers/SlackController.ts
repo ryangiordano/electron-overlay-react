@@ -60,6 +60,11 @@ export default class SlackController {
         response.send(hasValidTokens);
       }
     );
+
+    this.router.get(`${this.path}/data`, async (_request, response) => {
+      const data = await this.getSlackTeamData();
+      response.send(data);
+    });
   }
 
   private async getChannel(channelIdentifier: string) {
@@ -78,6 +83,12 @@ export default class SlackController {
         success: false,
       };
     }
+  }
+
+  private async getSlackTeamData() {
+    const data: any = await this.slackContext.getSlackTeamData();
+    const i = await data.info();
+    return i;
   }
 
   private async getLocalCredentials() {

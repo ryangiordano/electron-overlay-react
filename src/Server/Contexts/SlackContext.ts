@@ -33,6 +33,11 @@ export default class SlackContext {
     });
   }
 
+  async getSlackTeamData() {
+    const webClient = await this.buildWebClient();
+    return webClient?.team;
+  }
+
   async getUsers() {
     const webClient = await this.buildWebClient();
     const users = await webClient?.users?.list();
@@ -40,7 +45,6 @@ export default class SlackContext {
   }
   async getChannels() {
     const webClient = await this.buildWebClient();
-
     const channels = await webClient?.conversations?.list();
     return channels;
   }
@@ -74,8 +78,6 @@ export default class SlackContext {
       );
     });
   }
-
-  registerWebClient() {}
 
   async getSlackBotUserOauthToken() {
     const localData = await this.getLocalSlackData();

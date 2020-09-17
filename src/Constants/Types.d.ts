@@ -31,6 +31,30 @@ declare type SlackChannel = {
   num_members: number;
 };
 
+declare type SlackInfo = {
+  ok: boolean;
+  team: {
+    id: string;
+    name: string;
+    domain: string;
+    email_domain: string;
+    icon: {
+      image_34: string;
+      image_44: string;
+      image_68: string;
+      image_88: string;
+      image_102: string;
+      image_132: string;
+      image_230: string;
+      image_default: boolean;
+    };
+  };
+  response_metadata: {
+    scopes: string[];
+    acceptedScopes: string[];
+  };
+};
+
 declare type SlackMessageEvent = {
   client_msg_id: string;
   suppress_notification: boolean;

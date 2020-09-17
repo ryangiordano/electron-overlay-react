@@ -29,6 +29,13 @@ export default class SlackService {
     return channel?.data?.channel;
   }
 
+  async getTeamInfo(): Promise<SlackInfo> {
+    const channel = this.endPoint
+      ? await axios.get(`${this.endPoint}/slack/channels/data`)
+      : null;
+    return channel?.data;
+  }
+
   /**
    * Confirms whether the user has registered valid
    * tokens with the application yet
@@ -40,7 +47,7 @@ export default class SlackService {
     return Boolean(valid?.data);
   }
 
-  async registerTokens(botToken: string, userToken: string) {
+  async setTokens(botToken: string | null, userToken: string | null) {
     const response = this.endPoint
       ? await axios.post(`${this.endPoint}/slack/local-credentials`, {
           slackUserToken: userToken,

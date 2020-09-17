@@ -16,6 +16,8 @@ const LazyCounterPage = React.lazy(
   () => import(/* webpackChunkName: "CounterPage" */ "./Pages/CounterPage")
 );
 
+// const LazyHomePage = React.lazy()
+
 // const CounterPage = (props: Record<string, any>) => (
 //   <React.Suspense fallback={<h1>Loading...</h1>}>
 //     <LazyCounterPage {...props} />

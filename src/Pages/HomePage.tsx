@@ -1,8 +1,12 @@
 import React from "react";
-import { Home } from "../components/Home";
+import Home from "../Components/Home";
 
-const HomePage = () => {
-  return <Home />;
+interface HomePageProps {
+  history: any;
+}
+
+const HomePage = (props: HomePageProps) => {
+  return <Home {...props} />;
 };
 
 export default HomePage;

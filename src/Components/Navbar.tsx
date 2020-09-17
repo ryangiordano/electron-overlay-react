@@ -11,15 +11,19 @@ export const Navbar = () => {
         <>
           {fullScreenMode ? null : (
             <nav
-              className="navbar navbar-expand-lg navbar-light bg-light"
+              className="navbar navbar-light bg-light"
               style={{
                 position: "fixed",
                 top: 0,
+                display: "flex",
+                flexWrap: "nowrap",
                 width: "100%",
                 zIndex: 1000,
               }}
             >
-              <h1 style={{ whiteSpace: "nowrap" }} className="mr-3">Slack Overlay</h1>
+              <h1 style={{ whiteSpace: "nowrap" }} className="mr-3">
+                Slack Overlay
+              </h1>
               <ul
                 className="navbar-nav mr-auto w-100"
                 style={{

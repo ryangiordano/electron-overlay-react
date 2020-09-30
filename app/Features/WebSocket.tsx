@@ -35,6 +35,9 @@ export default class WebSocketComponent extends React.Component<
       this.props.onMessage?.(e);
     };
   }
+  componentWillUnmount(){
+    this.ws.close();
+  }
 
   render() {
     const { children } = this.props;

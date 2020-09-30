@@ -16,7 +16,6 @@ export default class SlackController {
   }
 
   public async initializeContext() {
-    await createSlackDataFile();
     this.slackContext = new SlackContext();
     await this.slackContext.initialize();
   }

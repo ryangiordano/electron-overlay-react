@@ -1,10 +1,10 @@
-import { RTMClient } from "@slack/rtm-api";
-import { Server } from "ws";
+import { RTMClient } from '@slack/rtm-api';
+import { Server } from 'ws';
 
 export class Slack {
   private slackEvents: RTMClient;
   private wss: Server;
-  private clientSocket: any;
+  private clientSockets: Map<string, WebSocket> = new Map([]);
   constructor(token: string) {
     this.slackEvents = new RTMClient(token);
     this.wss = new Server({
@@ -29,33 +29,46 @@ export class Slack {
         // should not be compressed.
       },
     });
-    this.wss.on("connection", (ws) => {
-      this.clientSocket = ws;
+    this.wss.on('connection', (ws: any) => {
+      const uid = new Date().toString();
 
-      ws.on("close", () => {
-        this.clientSocket = {};
+      this.clientSockets.set(uid, ws);
+
+      ws.on('close', () => {
+        this.clientSockets.delete(uid);
       });
     });
   }
-
   public async initialize() {
-    this.slackEvents.on("reaction_added", (d) => this.handleReactionAdded(d));
+    this.slackEvents.on('reaction_added', (d) => this.handleReactionAdded(d));
 
-    this.slackEvents.on("message", (d) => this.handleMessage(d));
+    this.slackEvents.on('message', (d) => this.handleMessage(d));
 
-    this.slackEvents.on("user_change", (d) => this.handleUserChange(d));
+    this.slackEvents.on('user_change', (d) => this.handleUserChange(d));
     await this.slackEvents.start();
   }
 
   private handleReactionAdded(data: any) {
-    this.clientSocket.send(JSON.stringify(data));
+    if (this.clientSockets.size) {
+      this.clientSockets?.forEach((ws) => {
+        ws.send(JSON.stringify(data));
+      });
+    }
   }
 
   private handleMessage(data: any) {
-    this.clientSocket.send(JSON.stringify(data));
+    if (this.clientSockets.size) {
+      this.clientSockets?.forEach((ws) => {
+        ws.send(JSON.stringify(data));
+      });
+    }
   }
 
   private handleUserChange(data: any) {
-    this.clientSocket.send(JSON.stringify(data));
+    if (this.clientSockets.size) {
+      this.clientSockets?.forEach((ws) => {
+        ws.send(JSON.stringify(data));
+      });
+    }
   }
 }

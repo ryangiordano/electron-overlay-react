@@ -7,8 +7,11 @@ import { Slack } from '../Services/Slack';
  */
 export default class SlackController {
   public path = '/slack';
+
   public router = express.Router();
+
   private slack: Slack | undefined;
+
   private slackContext: SlackContext | undefined;
 
   constructor() {
@@ -75,8 +78,8 @@ export default class SlackController {
     });
   }
 
-  private async getChannel(channelIdentifier: string) {
-    const r: any = await this.slackContext?.getChannels();
+  private async getChannel(channelIdentifier: string, nextCursor?: string) {
+    const r: any = await this.slackContext?.getChannels(nextCursor);
     const channel = r?.channels.find(
       (c: any) => c.id === channelIdentifier || c.name === channelIdentifier
     );
@@ -85,12 +88,17 @@ export default class SlackController {
         success: true,
         channel,
       };
-    } else {
-      return {
-        error: 'This channel does not exist.',
-        success: false,
-      };
     }
+    if (r?.response_metadata?.next_cursor) {
+      return this.getChannel(
+        channelIdentifier,
+        r?.response_metadata?.next_cursor
+      );
+    }
+    return {
+      error: 'This channel does not exist.',
+      success: false,
+    };
   }
 
   private async getSlackTeamData() {

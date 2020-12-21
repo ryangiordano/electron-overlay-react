@@ -1,5 +1,5 @@
-import React, { useState, ReactNode, useEffect } from "react";
-import electron from "electron";
+import React, { useState, ReactNode, useEffect } from 'react';
+import electron from 'electron';
 
 type FullScreenContextType = {
   fullScreenMode: boolean;
@@ -24,7 +24,13 @@ interface FullScreenProviderProps {
  */
 const fullScreenModeSetter = (fullScreenMode: boolean) => {
   const w = electron.remote.getCurrentWindow();
-  w.setFullScreen(!fullScreenMode);
+  // w.setFullScreen(!fullScreenMode);
+  if (!fullScreenMode) {
+    w.maximize();
+  } else {
+    w.unmaximize();
+  }
+
   w.setIgnoreMouseEvents(!fullScreenMode);
   setAlwaysOnTop(!fullScreenMode);
 };
@@ -32,7 +38,7 @@ const fullScreenModeSetter = (fullScreenMode: boolean) => {
 const setAlwaysOnTop = (fullScreenMode: boolean) => {
   const w = electron.remote.getCurrentWindow();
   setTimeout(() => {
-    w.setAlwaysOnTop(fullScreenMode, "screen-saver");
+    w.setAlwaysOnTop(fullScreenMode, 'normal');
   }, 100);
 };
 
@@ -41,29 +47,29 @@ const setAlwaysOnTop = (fullScreenMode: boolean) => {
  */
 export const FullScreenProvider = ({ children }: FullScreenProviderProps) => {
   const w = electron.remote.getCurrentWindow();
-  const [fullScreenMode, setFullScreenMode] = useState(w.isFullScreen());
+  const [fullScreenMode, setFullScreenMode] = useState(w.isMaximized());
   /**
    * Listen for Electron's enter and leave full screen events,
    * in case the user triggers them by keystroke.
    */
   useEffect(() => {
-    w.on("leave-full-screen", () => {
+    w.on('unmaximize', () => {
       setAlwaysOnTop(false);
       setFullScreenMode(false);
     });
-    w.on("enter-full-screen", () => {
+    w.on('maximize', () => {
       setAlwaysOnTop(true);
       setFullScreenMode(true);
     });
     return () => {
-      w.off("leave-full-screen", () => {});
-      w.off("enter-full-screen", () => {});
+      w.off('unmaximize', () => {});
+      w.off('maximize', () => {});
     };
   }, []);
   return (
     <FullScreenContext.Provider
       value={{
-        fullScreenMode: fullScreenMode,
+        fullScreenMode,
         toggleFullScreen: () => {
           fullScreenModeSetter(fullScreenMode);
           setFullScreenMode(!fullScreenMode);

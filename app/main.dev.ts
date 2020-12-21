@@ -20,6 +20,8 @@ const screenSize = {
   height: 728,
 };
 
+app.disableHardwareAcceleration();
+
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -68,8 +70,8 @@ const createWindow = async () => {
      * NB: Flashing fullscreen fixes a bug where toggling full screen
      * off the first time shrinks the window to (0,0).
      */
-    mainWindow.setFullScreen(true);
-    mainWindow.setFullScreen(false);
+    // mainWindow.setFullScreen(true);
+    // mainWindow.setFullScreen(false);
 
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
@@ -87,12 +89,14 @@ const createWindow = async () => {
   // menuBuilder.buildMenu();
 
   globalShortcut.register('F11', () => {
-    mainWindow?.setFullScreen(true);
+    // mainWindow?.setFullScreen(true);
+    mainWindow?.maximize();
     mainWindow?.setIgnoreMouseEvents(true);
   });
 
   globalShortcut.register('Esc', () => {
-    mainWindow?.setFullScreen(false);
+    // mainWindow?.setFullScreen(false);
+    mainWindow?.unmaximize();
     mainWindow?.setIgnoreMouseEvents(false);
   });
 };

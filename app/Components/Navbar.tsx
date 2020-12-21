@@ -1,6 +1,6 @@
 import React from 'react';
-import { FullScreenContext } from './FullScreenContext/FullScreenContext';
 import { NavLink, useLocation } from 'react-router-dom';
+import { FullScreenContext } from './FullScreenContext/FullScreenContext';
 import routes from '../constants/routes.json';
 
 export const Navbar = () => {
@@ -34,7 +34,7 @@ export const Navbar = () => {
               >
                 {location.pathname.includes('/channel/') ? (
                   <li className="nav-item active">
-                    <NavLink to={'/home'} className="btn btn-info">
+                    <NavLink to="/home" className="btn btn-info">
                       Home
                     </NavLink>
                   </li>
@@ -57,10 +57,10 @@ export const Navbar = () => {
                         width="2rem"
                         fill="white"
                       >
-                        <path d="m 10,16 2,0 0,-4 4,0 0,-2 L 10,10 l 0,6 0,0 z"></path>
-                        <path d="m 20,10 0,2 4,0 0,4 2,0 L 26,10 l -6,0 0,0 z"></path>
-                        <path d="m 24,24 -4,0 0,2 L 26,26 l 0,-6 -2,0 0,4 0,0 z"></path>
-                        <path d="M 12,20 10,20 10,26 l 6,0 0,-2 -4,0 0,-4 0,0 z"></path>
+                        <path d="m 10,16 2,0 0,-4 4,0 0,-2 L 10,10 l 0,6 0,0 z" />
+                        <path d="m 20,10 0,2 4,0 0,4 2,0 L 26,10 l -6,0 0,0 z" />
+                        <path d="m 24,24 -4,0 0,2 L 26,26 l 0,-6 -2,0 0,4 0,0 z" />
+                        <path d="M 12,20 10,20 10,26 l 6,0 0,-2 -4,0 0,-4 0,0 z" />
                       </svg>
                     </button>
                   </li>

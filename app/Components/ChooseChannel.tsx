@@ -1,9 +1,9 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { debounce } from 'lodash';
+import axios from 'axios';
 import TextInput from '../Patterns/Forms/TextInput';
 import { serverUrl } from '../Constants';
-import axios from 'axios';
 
 export default class ChooseChannel extends React.Component<any, any> {
   constructor(props: any) {
@@ -24,6 +24,7 @@ export default class ChooseChannel extends React.Component<any, any> {
     );
     const data = await response?.data;
     const valid = Boolean(data?.success);
+    console.log(data, valid);
     this.setState({
       validChannel: valid,
       loading: false,

@@ -1,8 +1,8 @@
 import { WebClient } from '@slack/web-api';
 import { app } from 'electron';
 import fs from 'fs';
-import { localSlackURL } from '../../Constants';
 import mkdirp from 'mkdirp';
+import { localSlackURL } from '../../Constants';
 
 interface LocalSlackTokens {
   SLACK_BOT_USER_OAUTH_TOKEN?: string;
@@ -64,6 +64,7 @@ export default class SlackContext {
       await createSlackDataFile();
     }
   }
+
   async buildWebClient() {
     const d = await getLocalSlackData();
     if (d?.SLACK_USER_OAUTH_TOKEN) {
@@ -83,11 +84,16 @@ export default class SlackContext {
     const users = await webClient?.users?.list();
     return users;
   }
-  async getChannels() {
+
+  async getChannels(nextCursor?: string) {
     const webClient = await this.buildWebClient();
-    const channels = await webClient?.conversations?.list();
+    const channels = await webClient?.conversations?.list({
+      limit: 400,
+      cursor: nextCursor || undefined,
+    });
     return channels;
   }
+
   async getCustomEmojis() {
     const webClient = await this.buildWebClient();
     const emojis = await webClient?.emoji?.list();
@@ -134,8 +140,7 @@ export default class SlackContext {
     if (webClient) {
       const results = await webClient?.auth.test();
       return Boolean(results?.ok);
-    } else {
-      return false;
     }
+    return false;
   }
 }

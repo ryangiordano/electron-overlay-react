@@ -24,7 +24,6 @@ interface FullScreenProviderProps {
  */
 const fullScreenModeSetter = (fullScreenMode: boolean) => {
   const w = electron.remote.getCurrentWindow();
-  // w.setFullScreen(!fullScreenMode);
   if (!fullScreenMode) {
     w.maximize();
   } else {
@@ -32,13 +31,14 @@ const fullScreenModeSetter = (fullScreenMode: boolean) => {
   }
 
   w.setIgnoreMouseEvents(!fullScreenMode);
+  w.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   setAlwaysOnTop(!fullScreenMode);
 };
 
 const setAlwaysOnTop = (fullScreenMode: boolean) => {
   const w = electron.remote.getCurrentWindow();
   setTimeout(() => {
-    w.setAlwaysOnTop(fullScreenMode, 'normal');
+    w.setAlwaysOnTop(fullScreenMode, 'screen-saver');
   }, 100);
 };
 

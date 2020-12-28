@@ -3,8 +3,11 @@ import { Server } from 'ws';
 
 export class Slack {
   private slackEvents: RTMClient;
+
   private wss: Server;
+
   private clientSockets: Map<string, WebSocket> = new Map([]);
+
   constructor(token: string) {
     this.slackEvents = new RTMClient(token);
     this.wss = new Server({
@@ -39,6 +42,7 @@ export class Slack {
       });
     });
   }
+
   public async initialize() {
     this.slackEvents.on('reaction_added', (d) => this.handleReactionAdded(d));
 
@@ -49,6 +53,7 @@ export class Slack {
   }
 
   private handleReactionAdded(data: any) {
+    console.log(data);
     if (this.clientSockets.size) {
       this.clientSockets?.forEach((ws) => {
         ws.send(JSON.stringify(data));

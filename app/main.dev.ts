@@ -20,6 +20,17 @@ const screenSize = {
   height: 728,
 };
 
+const setFullScreen = (w: BrowserWindow, set: boolean) => {
+  if (set) {
+    w?.maximize();
+  } else {
+    w?.unmaximize();
+  }
+  w?.setIgnoreMouseEvents(set);
+  w?.setAlwaysOnTop(set, 'floating');
+  w?.setVisibleOnAllWorkspaces(set, { visibleOnFullScreen: set });
+};
+
 app.disableHardwareAcceleration();
 
 const installExtensions = async () => {
@@ -42,8 +53,12 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: screenSize.width,
     height: screenSize.height,
-    transparent: true,
+    // transparent: true,
     frame: false,
+    alwaysOnTop: true,
+    show: false,
+    // resizable: false,
+    movable: false,
     webPreferences:
       (process.env.NODE_ENV === 'production' ||
         process.env.E2E_BUILD === 'true') &&
@@ -51,10 +66,12 @@ const createWindow = async () => {
         ? {
             nodeIntegration: true,
             devTools: false,
+            enableRemoteModule: true,
           }
         : {
             preload: path.join(__dirname, 'dist/renderer.prod.js'),
             devTools: false,
+            enableRemoteModule: true,
           },
   });
 
@@ -77,6 +94,8 @@ const createWindow = async () => {
       mainWindow.minimize();
     } else {
       mainWindow.show();
+      mainWindow.showInactive();
+
       mainWindow.focus();
     }
   });
@@ -88,16 +107,49 @@ const createWindow = async () => {
   // const menuBuilder = new MenuBuilder(mainWindow);
   // menuBuilder.buildMenu();
 
-  globalShortcut.register('F11', () => {
+  globalShortcut.register('z', () => {
     // mainWindow?.setFullScreen(true);
-    mainWindow?.maximize();
-    mainWindow?.setIgnoreMouseEvents(true);
+    app.dock.hide();
+    setFullScreen(mainWindow, true);
+
+    // This actually works, creating a new browser window
+    // Maybe we can change the FullScreenContext in the view
+    // layer to instead open and close a new window
+    // setTimeout(() => {
+    //   const w = new BrowserWindow({
+    //     width: screenSize.width,
+    //     height: screenSize.height,
+    //     // transparent: true,
+    //     frame: false,
+    //     alwaysOnTop: true,
+    //     show: false,
+    //     // resizable: false,
+    //     movable: false,
+    //     webPreferences:
+    //       (process.env.NODE_ENV === 'production' ||
+    //         process.env.E2E_BUILD === 'true') &&
+    //       process.env.ERB_SECURE !== 'true'
+    //         ? {
+    //             nodeIntegration: true,
+    //             devTools: false,
+    //             enableRemoteModule: true,
+    //           }
+    //         : {
+    //             preload: path.join(__dirname, 'dist/renderer.prod.js'),
+    //             devTools: false,
+    //             enableRemoteModule: true,
+    //           },
+    //   });
+    //   w.show();
+    //   w.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    //   w.setAlwaysOnTop(true, 'floating');
+    // }, 2000);
   });
 
   globalShortcut.register('Esc', () => {
     // mainWindow?.setFullScreen(false);
-    mainWindow?.unmaximize();
-    mainWindow?.setIgnoreMouseEvents(false);
+    app.dock.show();
+    setFullScreen(mainWindow, false);
   });
 };
 

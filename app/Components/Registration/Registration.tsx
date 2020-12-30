@@ -1,7 +1,7 @@
-import TextInput from "../../Patterns/Forms/TextInput";
-import { useState } from "react";
-import React from "react";
-import SlackService from "../../Services/SlackService";
+import React, { useState } from 'react';
+
+import TextInput from '../../Patterns/Forms/TextInput';
+import SlackService from '../../Services/SlackService';
 
 export const registerTokens = async (botToken: string, userToken: string) => {
   const ss = new SlackService();
@@ -20,10 +20,10 @@ const Registration = ({
     botAuthToken: string;
   }) => void;
 }) => {
-  const userAuthTokenId = "user-auth-token";
-  const botAuthTokenId = "bot-auth-token";
-  const [uat, setUserAuthToken] = useState("");
-  const [bat, setBotAuthToken] = useState("");
+  const userAuthTokenId = 'user-auth-token';
+  const botAuthTokenId = 'bot-auth-token';
+  const [uat, setUserAuthToken] = useState('');
+  const [bat, setBotAuthToken] = useState('');
   return (
     <>
       <form>

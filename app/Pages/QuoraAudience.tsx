@@ -1,20 +1,19 @@
-import React from "react";
-import debounce from "lodash/debounce";
-import EmojiImage from "../Components/EmojiImage";
-import { EmojiShortnameDict } from "../Shared/Emojis";
-import AudienceStage from "../Components/AudienceStage";
+import React from 'react';
+import debounce from 'lodash/debounce';
+import parse from 'html-react-parser';
+import { RouteComponentProps } from 'react-router-dom';
+import EmojiImage from '../Components/EmojiImage';
+import { EmojiShortnameDict } from '../Shared/Emojis';
+import AudienceStage from '../Components/AudienceStage';
 
-import parse from "html-react-parser";
-import { RouteComponentProps } from "react-router-dom";
-import QuoraAudienceContext from "../Shared/QuoraAudienceContext";
-import SlackService from "../Services/SlackService";
-import WebSocketComponent from "../Features/WebSocket";
+import QuoraAudienceContext from '../Shared/QuoraAudienceContext';
+import SlackService from '../Services/SlackService';
+import WebSocketComponent from '../Features/WebSocket';
 
 export interface QuoraAudienceState {
   reactions: { emoji: JSX.Element; key: number }[];
   messages: { key: string; content: string }[];
   reactionCount: number;
-  fullScreenMode: boolean;
   focusChannel: SlackChannel | null;
 }
 
@@ -25,19 +24,19 @@ interface QuoraAudienceProps {
 export const emojiFromUnicodeReaction = (reaction: string) => {
   let el = [
     <React.Fragment key={Math.random() * 1000}>
-      {parse(EmojiShortnameDict[reaction] || "")}
+      {parse(EmojiShortnameDict[reaction] || '')}
     </React.Fragment>,
   ];
-  if (reaction.indexOf("::") > -1) {
+  if (reaction.indexOf('::') > -1) {
     el = reaction
-      .split("::")
+      .split('::')
       .map((r) => (
         <React.Fragment key={Math.random() * 1000}>
-          {parse(EmojiShortnameDict[r] || "")}
+          {parse(EmojiShortnameDict[r] || '')}
         </React.Fragment>
       ));
   }
-  return <div style={{ height: "15px", width: "15px" }}>{el}</div>;
+  return <div style={{ height: '15px', width: '15px' }}>{el}</div>;
 };
 
 export default class QuoraAudience extends React.Component<
@@ -45,14 +44,16 @@ export default class QuoraAudience extends React.Component<
   QuoraAudienceState
 > {
   private emojis: any;
+
   private users: any;
+
   private slackService: SlackService;
+
   constructor(props: any) {
     super(props);
     this.state = {
       reactions: [],
       messages: [],
-      fullScreenMode: false,
       reactionCount: 0,
       focusChannel: null,
     };
@@ -79,7 +80,7 @@ export default class QuoraAudience extends React.Component<
   }
 
   private isSlackEmoji(key: string) {
-    const k = key.split("::")[0];
+    const k = key.split('::')[0];
     return Boolean(EmojiShortnameDict[k]);
   }
 
@@ -91,7 +92,7 @@ export default class QuoraAudience extends React.Component<
       ) : this.isSlackEmoji(key) ? (
         emojiFromUnicodeReaction(reaction)
       ) : (
-        <EmojiImage src={this.emojis["slowpoke"]} />
+        <EmojiImage src={this.emojis.slowpoke} />
       );
     this.setState((prevState) => {
       const count = prevState.reactionCount + 1;
@@ -115,24 +116,24 @@ export default class QuoraAudience extends React.Component<
       if (label) {
         // Slack-provided labels tell us how to display some content without having to do a lookup.
         // Most special Slack mentions will start with an "@".
-        let prefix = "@";
+        let prefix = '@';
         if (formatType === undefined) {
           // Links will not have a special starting character.
-          prefix = "";
-        } else if (formatType === "#") {
+          prefix = '';
+        } else if (formatType === '#') {
           // Channel mentions will start with "#".
-          prefix = "#";
+          prefix = '#';
         }
         return `${
-          formatType === "#" ? "#" : formatType === undefined ? "" : "@"
+          formatType === '#' ? '#' : formatType === undefined ? '' : '@'
         }${label}`;
       }
       switch (formatType) {
-        case "@": {
+        case '@': {
           // Format user @mentions if the user exists in our cache.
           return this.users[content] ? `@${this.users[content].name}` : match;
         }
-        case "!": {
+        case '!': {
           // Format special mentions like @here.
           return `@${content}`;
         }
@@ -170,14 +171,14 @@ export default class QuoraAudience extends React.Component<
   }, 15000);
 
   private handleWebsocketMessage(event: SlackEvent) {
-    if (event?.type === "reaction_added") {
+    if (event?.type === 'reaction_added') {
       const channelId = event.item.channel;
       this.state.focusChannel?.id === channelId
         ? this.addReaction(event?.reaction)
         : null;
     }
 
-    if (event?.type === "message") {
+    if (event?.type === 'message') {
       const channelId = event.channel;
       this.state.focusChannel?.id === channelId &&
         event.text &&
@@ -189,9 +190,9 @@ export default class QuoraAudience extends React.Component<
   render() {
     return (
       <WebSocketComponent
-        url={"localhost:5003"}
+        url="localhost:5003"
         onMessage={(e) => {
-          if (typeof e.data === "string") {
+          if (typeof e.data === 'string') {
             const event: SlackEvent = JSON.parse(e.data);
             this.handleWebsocketMessage(event);
           }

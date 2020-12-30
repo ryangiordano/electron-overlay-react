@@ -5,23 +5,10 @@ import routes from './Constants/routes.json';
 import App from './Pages/App';
 import HomePage from './Pages/HomePage';
 import QuoraAudience from './Pages/QuoraAudience';
-import { Navbar } from './Components/Navbar';
 import { FullScreenContext } from './Components/FullScreenContext/FullScreenContext';
 import RegisterPage from './Pages/RegisterPage';
 import SplashPage from './Pages/SplashPage';
-
-// Lazily load routes and code split with webpack
-const LazyCounterPage = React.lazy(() =>
-  import(/* webpackChunkName: "CounterPage" */ './Pages/CounterPage')
-);
-
-// const LazyHomePage = React.lazy()
-
-// const CounterPage = (props: Record<string, any>) => (
-//   <React.Suspense fallback={<h1>Loading...</h1>}>
-//     <LazyCounterPage {...props} />
-//   </React.Suspense>
-// );
+import Navbar from './Components/Navbar';
 
 export default function Routes() {
   return (
@@ -43,7 +30,7 @@ export default function Routes() {
                 <Route path={routes.REGISTER} component={RegisterPage} />
                 <Route path={routes.CHANNEL} component={QuoraAudience} />
                 <Route path={routes.HOME} component={HomePage} />
-                <Route path={'/'} component={SplashPage} />
+                <Route path="/" component={SplashPage} />
               </Switch>
             </Router>
           </div>

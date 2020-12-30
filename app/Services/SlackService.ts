@@ -5,6 +5,7 @@ axios.defaults.adapter = require('axios/lib/adapters/http');
 
 export default class SlackService {
   private endPoint = `${serverUrl}/api`;
+
   async getChannels() {
     const channels = this.endPoint
       ? await axios.get(`${this.endPoint}/slack/channels`)

@@ -7,7 +7,6 @@ type Props = {
 };
 
 export default function App(props: Props) {
-  alert('Hello');
   const { children } = props;
   return (
     <Modal>

@@ -11,25 +11,13 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, globalShortcut } from 'electron';
-import MenuBuilder from './menu';
+import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron';
 import { createServer } from './Server/Server';
+import { screenSize } from './Constants';
+import BrowserOverlayWindow from './ElectronComponents/BrowserOverlayWindow';
 
-const screenSize = {
-  width: 1024,
-  height: 728,
-};
-
-const setFullScreen = (w: BrowserWindow, set: boolean) => {
-  if (set) {
-    w?.maximize();
-  } else {
-    w?.unmaximize();
-  }
-  w?.setIgnoreMouseEvents(set);
-  w?.setAlwaysOnTop(set, 'floating');
-  w?.setVisibleOnAllWorkspaces(set, { visibleOnFullScreen: set });
-};
+let mainWindow: BrowserWindow | null = null;
+const overlayWindow = new BrowserOverlayWindow({ screenSize });
 
 app.disableHardwareAcceleration();
 
@@ -53,24 +41,20 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: screenSize.width,
     height: screenSize.height,
-    // transparent: true,
     frame: false,
-    alwaysOnTop: true,
     show: false,
-    // resizable: false,
-    movable: false,
     webPreferences:
       (process.env.NODE_ENV === 'production' ||
         process.env.E2E_BUILD === 'true') &&
       process.env.ERB_SECURE !== 'true'
         ? {
             nodeIntegration: true,
-            devTools: false,
+            devTools: true,
             enableRemoteModule: true,
           }
         : {
             preload: path.join(__dirname, 'dist/renderer.prod.js'),
-            devTools: false,
+            devTools: true,
             enableRemoteModule: true,
           },
   });
@@ -83,12 +67,6 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
-    /**
-     * NB: Flashing fullscreen fixes a bug where toggling full screen
-     * off the first time shrinks the window to (0,0).
-     */
-    // mainWindow.setFullScreen(true);
-    // mainWindow.setFullScreen(false);
 
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
@@ -104,56 +82,12 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  // const menuBuilder = new MenuBuilder(mainWindow);
-  // menuBuilder.buildMenu();
-
-  globalShortcut.register('z', () => {
-    // mainWindow?.setFullScreen(true);
-    app.dock.hide();
-    setFullScreen(mainWindow, true);
-
-    // This actually works, creating a new browser window
-    // Maybe we can change the FullScreenContext in the view
-    // layer to instead open and close a new window
-    // setTimeout(() => {
-    //   const w = new BrowserWindow({
-    //     width: screenSize.width,
-    //     height: screenSize.height,
-    //     // transparent: true,
-    //     frame: false,
-    //     alwaysOnTop: true,
-    //     show: false,
-    //     // resizable: false,
-    //     movable: false,
-    //     webPreferences:
-    //       (process.env.NODE_ENV === 'production' ||
-    //         process.env.E2E_BUILD === 'true') &&
-    //       process.env.ERB_SECURE !== 'true'
-    //         ? {
-    //             nodeIntegration: true,
-    //             devTools: false,
-    //             enableRemoteModule: true,
-    //           }
-    //         : {
-    //             preload: path.join(__dirname, 'dist/renderer.prod.js'),
-    //             devTools: false,
-    //             enableRemoteModule: true,
-    //           },
-    //   });
-    //   w.show();
-    //   w.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-    //   w.setAlwaysOnTop(true, 'floating');
-    // }, 2000);
-  });
-
+  // TODO(rgiordano): Make this a cmd+esc combo listener
   globalShortcut.register('Esc', () => {
-    // mainWindow?.setFullScreen(false);
     app.dock.show();
-    setFullScreen(mainWindow, false);
+    overlayWindow?.closeWindow();
   });
 };
-
-let mainWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -171,23 +105,30 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
+// ===================================================
+// Event listeners
+// ===================================================
+
 /**
- * Add event listeners...
+ * Respect the OSX convention of having the application in memory even after all windows have been closed
  */
 app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
 if (process.env.E2E_BUILD === 'true') {
-  // eslint-disable-next-line promise/catch-or-return
-  app.whenReady().then(() => {
-    createWindow();
-    createServer();
-  });
+  app
+    .whenReady()
+    .then(() => {
+      createWindow();
+      createServer();
+      return app;
+    })
+    .catch((e) => {
+      throw new Error(e);
+    });
 } else {
   app.on('ready', () => {
     createWindow();
@@ -199,4 +140,21 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
+});
+
+// ===================================================
+// Communicating with the overlay window
+// ===================================================
+ipcMain.on('open-overlay', (_event, { id }) => {
+  overlayWindow.openWindow();
+  overlayWindow.loadURL(`file://${__dirname}/app.html`)?.then(() => {
+    // TODO(rgiordano): Think of a more elegant solution for this:
+    setTimeout(() => {
+      overlayWindow.send('navigate', { route: 'channel', id });
+    }, 500);
+  });
+});
+
+ipcMain.on('close-overlay', () => {
+  overlayWindow.closeWindow();
 });

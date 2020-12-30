@@ -1,6 +1,6 @@
-import React, { useState, useContext } from "react";
-import { CSSTransition } from "react-transition-group";
-import Card from "./Card";
+import React, { useState, useContext } from 'react';
+import { CSSTransition } from 'react-transition-group';
+import Card from './Card';
 
 export interface ModalContextProps {
   openModal: (Component: JSX.Element) => void;
@@ -33,13 +33,13 @@ export const Modal = (props: any) => {
         <div
           style={{
             zIndex: 1000,
-            position: "fixed",
-            height: modalOpen ? "100vh" : 0,
-            width: "100%",
-            backgroundColor: "rgba(0,0,0,.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            position: 'fixed',
+            height: modalOpen ? '100vh' : 0,
+            width: '100%',
+            backgroundColor: 'rgba(0,0,0,.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
           onClick={(e) => {
             e.preventDefault();
@@ -74,11 +74,15 @@ export const Modal = (props: any) => {
   );
 };
 
-export const ModalConsumer = (props: any) => {
+export const ModalConsumer = ({
+  children,
+}: {
+  children: (context: ModalContextProps) => JSX.Element;
+}) => {
   return (
     <ModalContext.Consumer>
       {(context) => {
-        return props.children(context);
+        return children(context);
       }}
     </ModalContext.Consumer>
   );
@@ -87,21 +91,25 @@ export const ModalConsumer = (props: any) => {
 interface ModalLayoutProps {
   header: JSX.Element;
   children: JSX.Element;
-  styles?: any;
+  styles?: React.CSSProperties;
 }
 
-export const ModalLayout = ({ header, children, styles }: ModalLayoutProps) => {
+export const ModalLayout = ({
+  header,
+  children,
+  styles = {},
+}: ModalLayoutProps) => {
   const { closeModal } = useModal();
   return (
     <Card
-      style={{ margin: "1rem", paddingBottom: "1rem", ...styles }}
+      style={{ margin: '1rem', paddingBottom: '1rem', ...styles }}
       header={
         <div
           className="d-flex"
-          style={{ justifyContent: "space-between", alignItems: "center" }}
+          style={{ justifyContent: 'space-between', alignItems: 'center' }}
         >
           {header}
-          <div className="d-flex" style={{ justifyContent: "flex-end" }}>
+          <div className="d-flex" style={{ justifyContent: 'flex-end' }}>
             <button
               className="btn btn-info btn-outline"
               onClick={() => {

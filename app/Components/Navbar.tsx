@@ -1,9 +1,9 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { ipcRenderer } from 'electron';
 import { FullScreenContext } from './FullScreenContext/FullScreenContext';
-import routes from '../constants/routes.json';
 
-export const Navbar = () => {
+const Navbar = () => {
   const location = useLocation();
   return (
     <FullScreenContext.Consumer>
@@ -21,6 +21,14 @@ export const Navbar = () => {
                 zIndex: 1000,
               }}
             >
+              <button
+                type="button"
+                onClick={() => {
+                  ipcRenderer.send('close-overlay', { data: 'Some data' });
+                }}
+              >
+                Close
+              </button>
               <h1 style={{ whiteSpace: 'nowrap' }} className="mr-3">
                 Slack Overlay
               </h1>
@@ -46,6 +54,7 @@ export const Navbar = () => {
                   >
                     <button
                       className="btn btn-info p-0"
+                      type="button"
                       onClick={() => {
                         toggleFullScreen();
                       }}
@@ -73,3 +82,5 @@ export const Navbar = () => {
     </FullScreenContext.Consumer>
   );
 };
+
+export default Navbar;

@@ -1,9 +1,50 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+/* eslint-disable react/require-default-props */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable jsx-a11y/control-has-associated-label */
+import React, { useEffect } from 'react';
+import { NavLink, useHistory } from 'react-router-dom';
 import { debounce } from 'lodash';
 import axios from 'axios';
+import { ipcRenderer } from 'electron';
 import TextInput from '../Patterns/Forms/TextInput';
 import { serverUrl } from '../Constants';
+
+const ChannelNavButton = ({
+  validChannel,
+  channelName,
+}: {
+  validChannel: boolean;
+  channelName?: string;
+}) => {
+  // This needs to go in a much better place than a button component.
+  const history = useHistory();
+  useEffect(() => {
+    ipcRenderer.on(
+      'navigate',
+      (_event, { route, id }: { route: string; id: string }) => {
+        history.push(`/${route}/${id}`);
+      }
+    );
+    return () => {
+      ipcRenderer.off('navigate', () => {});
+    };
+  });
+  return (
+    <button
+      type="button"
+      className={`btn btn-info ${validChannel ? '' : 'disabled'}`}
+      style={{
+        whiteSpace: 'nowrap',
+        marginLeft: '1rem',
+      }}
+      onClick={() => {
+        ipcRenderer.send('open-overlay', { id: channelName });
+      }}
+    >
+      {validChannel ? `Stream from ${channelName}` : `Enter channel`}
+    </button>
+  );
+};
 
 export default class ChooseChannel extends React.Component<any, any> {
   constructor(props: any) {
@@ -16,30 +57,30 @@ export default class ChooseChannel extends React.Component<any, any> {
   }
 
   getChannel = debounce(async () => {
-    if (!this.state.channelName.length) {
+    const { channelName } = this.state;
+
+    if (!channelName.length) {
       return this.setState({ validChannel: false, loading: false });
     }
     const response = await axios.get(
-      `${serverUrl}/api/slack/channels/${this.state.channelName}`
+      `${serverUrl}/api/slack/channels/${channelName}`
     );
     const data = await response?.data;
     const valid = Boolean(data?.success);
-    console.log(data, valid);
-    this.setState({
+    return this.setState({
       validChannel: valid,
       loading: false,
     });
   }, 300);
 
   private isValid() {
-    return (
-      !this.state.loading &&
-      this.state.channelName.length &&
-      this.state.validChannel
-    );
+    const { validChannel, channelName, loading } = this.state;
+
+    return !loading && channelName.length && validChannel;
   }
 
   render() {
+    const { validChannel, channelName, loading } = this.state;
     return (
       <div
         style={{
@@ -57,7 +98,7 @@ export default class ChooseChannel extends React.Component<any, any> {
         <div style={{ display: 'flex' }}>
           <TextInput
             id="channel-id"
-            value={this.state.channelName}
+            value={channelName}
             onChange={(e: any) => {
               this.setState(
                 { channelName: e.target.value, loading: true },
@@ -68,27 +109,25 @@ export default class ChooseChannel extends React.Component<any, any> {
             }}
             placeholder="Enter a channel name or ID"
           />
-          <NavLink
-            to={`/channel/${this.state.channelName}`}
-            className={`btn btn-info ${
-              this.state.validChannel ? '' : 'disabled'
-            }`}
+          {/* <NavLink
+            to={`/channel/${channelName}`}
+            className={`btn btn-info ${validChannel ? '' : 'disabled'}`}
             activeClassName="active"
             style={{
               whiteSpace: 'nowrap',
               marginLeft: '1rem',
             }}
           >
-            {this.state.validChannel
-              ? `Stream from ${this.state.channelName}`
-              : `Enter channel`}
-          </NavLink>
+            {validChannel ? `Stream from ${channelName}` : `Enter channel`}
+          </NavLink> */}
+          <ChannelNavButton
+            validChannel={validChannel}
+            channelName={channelName}
+          />
         </div>
 
         <div
-          className={`validation ${
-            this.state.validChannel ? 'valid' : 'invalid'
-          }`}
+          className={`validation ${validChannel ? 'valid' : 'invalid'}`}
           role="alert"
           style={{
             height: '1rem',
@@ -96,10 +135,19 @@ export default class ChooseChannel extends React.Component<any, any> {
           }}
         >
           {this.isValid() ? (
-            <p className="text-success">We're good to use this channel 👍</p>
-          ) : !this.state.loading && this.state.channelName.length ? (
+            <p className="text-success">
+              We&apos;re good to use this channel
+              <span aria-label="thumbs-up" role="img">
+                👍
+              </span>
+            </p>
+          ) : null}
+          {!this.isValid() && !loading && channelName.length ? (
             <p className="text-primary">
-              Sorry, we can't find this channel... 😢
+              Sorry, we can&apos;t find this channel...
+              <span aria-label="sad-face" role="img">
+                😢
+              </span>
             </p>
           ) : null}
         </div>

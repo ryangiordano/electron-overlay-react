@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import debounce from 'lodash/debounce';
 import parse from 'html-react-parser';
@@ -20,6 +21,11 @@ export interface QuoraAudienceState {
 interface QuoraAudienceProps {
   channelId: string;
 }
+
+const isSlackEmoji = (key: string) => {
+  const k = key.split('::')[0];
+  return Boolean(EmojiShortnameDict[k]);
+};
 
 export const emojiFromUnicodeReaction = (reaction: string) => {
   let el = [
@@ -49,6 +55,10 @@ export default class QuoraAudience extends React.Component<
 
   private slackService: SlackService;
 
+  private clearReactions = debounce(() => {
+    this.setState({ reactions: [] });
+  }, 15000);
+
   constructor(props: any) {
     super(props);
     this.state = {
@@ -66,10 +76,8 @@ export default class QuoraAudience extends React.Component<
     this.emojis = emojis;
     // TODO(rgiordano): Cache this
     await this.fetchUsers();
-
-    const channel = await this.slackService.getChannel(
-      this.props.match.params.channelId
-    );
+    const { match } = this.props;
+    const channel = await this.slackService.getChannel(match.params.channelId);
 
     this.setState({ focusChannel: channel });
   }
@@ -79,17 +87,12 @@ export default class QuoraAudience extends React.Component<
     this.users = users;
   }
 
-  private isSlackEmoji(key: string) {
-    const k = key.split('::')[0];
-    return Boolean(EmojiShortnameDict[k]);
-  }
-
   private addReaction(reaction: string) {
     const key = reaction;
     const emoji =
       this.emojis && this.emojis[key] ? (
         <EmojiImage src={this.emojis[key]} />
-      ) : this.isSlackEmoji(key) ? (
+      ) : isSlackEmoji(key) ? (
         emojiFromUnicodeReaction(reaction)
       ) : (
         <EmojiImage src={this.emojis.slowpoke} />
@@ -137,8 +140,9 @@ export default class QuoraAudience extends React.Component<
           // Format special mentions like @here.
           return `@${content}`;
         }
-        case undefined: {
-          // Links are presented as is.
+        // Links are returned as is
+        case undefined:
+        default: {
           return content;
         }
       }
@@ -152,42 +156,40 @@ export default class QuoraAudience extends React.Component<
     const userName = this.users
       ? this.users.find((u: any) => u.id === uid)?.name
       : null;
-    const prevState = this.state;
-    prevState.messages.unshift({
-      key: `${Date.now() / 100}`,
-      content: userName ? `${userName}: ${n}` : n,
-    });
-    if (prevState.messages.length > 6) {
-      prevState.messages.splice(6);
-    }
 
-    this.setState({
-      messages: [...prevState.messages],
+    this.setState((prevState) => {
+      prevState.messages.unshift({
+        key: `${Date.now() / 100}`,
+        content: userName ? `${userName}: ${n}` : n,
+      });
+      if (prevState.messages.length > 6) {
+        prevState.messages.splice(6);
+      }
+      return {
+        messages: [...prevState.messages],
+      };
     });
   }
 
-  private clearReactions = debounce(() => {
-    this.setState({ reactions: [] });
-  }, 15000);
-
   private handleWebsocketMessage(event: SlackEvent) {
+    const { focusChannel } = this.state;
     if (event?.type === 'reaction_added') {
       const channelId = event.item.channel;
-      this.state.focusChannel?.id === channelId
-        ? this.addReaction(event?.reaction)
-        : null;
+      if (focusChannel?.id === channelId) {
+        this.addReaction(event?.reaction);
+      }
     }
 
     if (event?.type === 'message') {
       const channelId = event.channel;
-      this.state.focusChannel?.id === channelId &&
-        event.text &&
-        event.user &&
+      if (focusChannel?.id === channelId && event.text && event.user) {
         this.addMessage(event.text, event.user);
+      }
     }
   }
 
   render() {
+    const { reactions, messages } = this.state;
     return (
       <WebSocketComponent
         url="localhost:5003"
@@ -203,9 +205,9 @@ export default class QuoraAudience extends React.Component<
             value={{ emojis: EmojiShortnameDict, quoraEmojis: this.emojis }}
           >
             <AudienceStage
-              reactions={this.state.reactions}
+              reactions={reactions}
               onRemove={() => this.clearReactions()}
-              messages={this.state.messages}
+              messages={messages}
             />
           </QuoraAudienceContext.Provider>
         )}

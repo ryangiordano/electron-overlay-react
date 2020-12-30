@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface WebSocketProps {
   url: string;
@@ -13,29 +13,32 @@ export default class WebSocketComponent extends React.Component<
   WebSocketProps
 > {
   private ws: WebSocket;
+
   constructor(props: any) {
     super(props);
-    this.ws = new WebSocket(`ws://${props.url}/`, "echo-protocol");
+    this.ws = new WebSocket(`ws://${props.url}/`, 'echo-protocol');
   }
 
   componentDidMount() {
+    const { onError, onClose, onOpen, onMessage } = this.props;
     this.ws.onerror = () => {
-      this.props.onError?.();
+      onError?.();
     };
 
     this.ws.onopen = () => {
-      this.props.onOpen?.();
+      onOpen?.();
     };
 
     this.ws.onclose = () => {
-      this.props.onClose?.();
+      onClose?.();
     };
 
     this.ws.onmessage = (e) => {
-      this.props.onMessage?.(e);
+      onMessage?.(e);
     };
   }
-  componentWillUnmount(){
+
+  componentWillUnmount() {
     this.ws.close();
   }
 

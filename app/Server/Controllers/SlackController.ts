@@ -1,6 +1,6 @@
 import * as express from 'express';
-import SlackContext, { createSlackDataFile } from '../Contexts/SlackContext';
-import { Slack } from '../Services/Slack';
+import SlackContext from '../Contexts/SlackContext';
+import Slack from '../Services/Slack';
 
 /**
  * For authenticating with slack, getting values such as users and custom emojis from slack.

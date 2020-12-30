@@ -1,4 +1,4 @@
-/* eslint global-require: off, no-console: off */
+/* eslint global-require: off */
 
 /**
  * This module executes inside of electron's main process. You can start
@@ -136,9 +136,11 @@ if (process.env.E2E_BUILD === 'true') {
   });
 }
 
+/**
+ * On macOS it's common to re-create a window in the app when the
+  dock icon is clicked and there are no other windows open.
+ */
 app.on('activate', () => {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
 });
 
@@ -151,7 +153,7 @@ ipcMain.on('open-overlay', (_event, { id }) => {
     // TODO(rgiordano): Think of a more elegant solution for this:
     setTimeout(() => {
       overlayWindow.send('navigate', { route: 'channel', id });
-    }, 500);
+    }, 1000);
   });
 });
 

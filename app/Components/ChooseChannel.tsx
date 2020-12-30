@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useEffect } from 'react';
-import { NavLink, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { debounce } from 'lodash';
 import axios from 'axios';
 import { ipcRenderer } from 'electron';
@@ -28,7 +28,8 @@ const ChannelNavButton = ({
     return () => {
       ipcRenderer.off('navigate', () => {});
     };
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <button
       type="button"
@@ -109,17 +110,6 @@ export default class ChooseChannel extends React.Component<any, any> {
             }}
             placeholder="Enter a channel name or ID"
           />
-          {/* <NavLink
-            to={`/channel/${channelName}`}
-            className={`btn btn-info ${validChannel ? '' : 'disabled'}`}
-            activeClassName="active"
-            style={{
-              whiteSpace: 'nowrap',
-              marginLeft: '1rem',
-            }}
-          >
-            {validChannel ? `Stream from ${channelName}` : `Enter channel`}
-          </NavLink> */}
           <ChannelNavButton
             validChannel={validChannel}
             channelName={channelName}

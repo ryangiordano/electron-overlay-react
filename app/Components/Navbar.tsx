@@ -21,14 +21,6 @@ const Navbar = () => {
                 zIndex: 1000,
               }}
             >
-              <button
-                type="button"
-                onClick={() => {
-                  ipcRenderer.send('close-overlay', { data: 'Some data' });
-                }}
-              >
-                Close
-              </button>
               <h1 style={{ whiteSpace: 'nowrap' }} className="mr-3">
                 Slack Overlay
               </h1>

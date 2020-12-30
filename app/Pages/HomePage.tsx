@@ -1,6 +1,4 @@
-import React, { useEffect } from 'react';
-import { useHistory } from 'react-router';
-import { ipcRenderer } from 'electron';
+import React from 'react';
 
 import Home from '../Components/Home';
 

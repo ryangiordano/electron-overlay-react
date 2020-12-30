@@ -1,7 +1,7 @@
 import { RTMClient } from '@slack/rtm-api';
 import { Server } from 'ws';
 
-export class Slack {
+export default class Slack {
   private slackEvents: RTMClient;
 
   private wss: Server;
@@ -53,7 +53,6 @@ export class Slack {
   }
 
   private handleReactionAdded(data: any) {
-    console.log(data);
     if (this.clientSockets.size) {
       this.clientSockets?.forEach((ws) => {
         ws.send(JSON.stringify(data));

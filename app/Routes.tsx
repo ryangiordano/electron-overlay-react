@@ -4,38 +4,21 @@ import { Switch, Route, BrowserRouter as Router } from 'react-router-dom';
 import routes from './Constants/routes.json';
 import App from './Pages/App';
 import HomePage from './Pages/HomePage';
-import QuoraAudience from './Pages/QuoraAudience';
-import { FullScreenContext } from './Components/FullScreenContext/FullScreenContext';
+import AudiencePage from './Pages/AudiencePage';
 import RegisterPage from './Pages/RegisterPage';
 import SplashPage from './Pages/SplashPage';
-import Navbar from './Components/Navbar';
 
 export default function Routes() {
   return (
     <App>
-      <FullScreenContext.Consumer>
-        {({ fullScreenMode }) => (
-          <div
-            style={{
-              backgroundColor: fullScreenMode ? 'rgba(0,0,0,0)' : '#fff',
-              height: '100%',
-              paddingBottom: '3rem',
-            }}
-          >
-            <Router>
-              <div style={{ paddingBottom: '5rem' }}>
-                <Navbar />
-              </div>
-              <Switch>
-                <Route path={routes.REGISTER} component={RegisterPage} />
-                <Route path={routes.CHANNEL} component={QuoraAudience} />
-                <Route path={routes.HOME} component={HomePage} />
-                <Route path="/" component={SplashPage} />
-              </Switch>
-            </Router>
-          </div>
-        )}
-      </FullScreenContext.Consumer>
+      <Router>
+        <Switch>
+          <Route path={routes.REGISTER} component={RegisterPage} />
+          <Route path={routes.CHANNEL} component={AudiencePage} />
+          <Route path={routes.HOME} component={HomePage} />
+          <Route path="/" component={SplashPage} />
+        </Switch>
+      </Router>
     </App>
   );
 }

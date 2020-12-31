@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import { FullScreenProvider } from '../Components/FullScreenContext/FullScreenContext';
 import { Modal } from '../Patterns/Modal';
 
 type Props = {
@@ -8,9 +7,5 @@ type Props = {
 
 export default function App(props: Props) {
   const { children } = props;
-  return (
-    <Modal>
-      <FullScreenProvider>{children}</FullScreenProvider>
-    </Modal>
-  );
+  return <Modal>{children}</Modal>;
 }

@@ -7,18 +7,18 @@ import EmojiImage from '../Components/EmojiImage';
 import { EmojiShortnameDict } from '../Shared/Emojis';
 import AudienceStage from '../Components/AudienceStage';
 
-import QuoraAudienceContext from '../Shared/QuoraAudienceContext';
 import SlackService from '../Services/SlackService';
 import WebSocketComponent from '../Features/WebSocket';
+import AudienceContext from '../Shared/AudienceContext';
 
-export interface QuoraAudienceState {
+export interface AudiencePageState {
   reactions: { emoji: JSX.Element; key: number }[];
   messages: { key: string; content: string }[];
   reactionCount: number;
   focusChannel: SlackChannel | null;
 }
 
-interface QuoraAudienceProps {
+interface AudiencePageProps {
   channelId: string;
 }
 
@@ -45,9 +45,9 @@ export const emojiFromUnicodeReaction = (reaction: string) => {
   return <div style={{ height: '15px', width: '15px' }}>{el}</div>;
 };
 
-export default class QuoraAudience extends React.Component<
-  RouteComponentProps<QuoraAudienceProps>,
-  QuoraAudienceState
+export default class AudiencePage extends React.Component<
+  RouteComponentProps<AudiencePageProps>,
+  AudiencePageState
 > {
   private emojis: any;
 
@@ -201,7 +201,7 @@ export default class QuoraAudience extends React.Component<
         }}
       >
         {() => (
-          <QuoraAudienceContext.Provider
+          <AudienceContext.Provider
             value={{ emojis: EmojiShortnameDict, quoraEmojis: this.emojis }}
           >
             <AudienceStage
@@ -209,7 +209,7 @@ export default class QuoraAudience extends React.Component<
               onRemove={() => this.clearReactions()}
               messages={messages}
             />
-          </QuoraAudienceContext.Provider>
+          </AudienceContext.Provider>
         )}
       </WebSocketComponent>
     );

@@ -1,7 +1,9 @@
 import { BrowserWindow } from 'electron';
 import path from 'path';
 
-// Create a browser window specifically for overlays
+/**
+ * Create a browser window specifically for overlays
+ */
 export default class BrowserOverlayWindow {
   private browserWindow?: BrowserWindow;
 

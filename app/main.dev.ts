@@ -82,8 +82,7 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  // TODO(rgiordano): Make this a cmd+esc combo listener
-  globalShortcut.register('Esc', () => {
+  globalShortcut.register('CommandOrControl+Esc', () => {
     app.dock.show();
     overlayWindow?.closeWindow();
   });

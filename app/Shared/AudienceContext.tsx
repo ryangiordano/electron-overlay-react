@@ -1,20 +1,20 @@
 import React, { createContext } from 'react';
 
-const QuoraAudienceContext = createContext({
+const AudienceContext = createContext({
   emojis: {},
   quoraEmojis: {},
 });
 
-export const withQuoraAudienceContext = <P extends Record<string, unknown>>(
+export const withAudienceContext = <P extends Record<string, unknown>>(
   Component: React.ComponentType<P>
 ) => (props: any) => {
   return (
-    <QuoraAudienceContext.Consumer>
+    <AudienceContext.Consumer>
       {(context) => (
         // eslint-disable-next-line react/jsx-props-no-spreading
         <Component {...props} context={{ ...props.context, ...context }} />
       )}
-    </QuoraAudienceContext.Consumer>
+    </AudienceContext.Consumer>
   );
 };
-export default QuoraAudienceContext;
+export default AudienceContext;

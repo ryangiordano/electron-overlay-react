@@ -1,8 +1,9 @@
 import React from 'react';
-import SlackService from '../Services/SlackService';
 import { RouteComponentProps } from 'react-router';
+import SlackService from '../Services/SlackService';
+import Page from './Page';
 
-interface SplashPageProps extends RouteComponentProps {}
+type SplashPageProps = RouteComponentProps;
 
 /**
  * Initial loading page of the application.  Handles checking for valid registered
@@ -10,31 +11,37 @@ interface SplashPageProps extends RouteComponentProps {}
  */
 class SplashPage extends React.Component<SplashPageProps> {
   private slackService: SlackService;
+
   constructor(props: SplashPageProps) {
     super(props);
     this.slackService = new SlackService();
   }
+
   async componentDidMount() {
+    const { history } = this.props;
     const hasValidTokens = await this.slackService.hasValidTokens();
     if (hasValidTokens) {
-      this.props.history.push('/home');
+      history.push('/home');
     } else {
-      this.props.history.push('/register');
+      history.push('/register');
     }
   }
+
   render() {
     return (
-      <div
-        style={{
-          height: '100vh',
-          width: '100vw',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        Slack Reaction Overlay
-      </div>
+      <Page>
+        <div
+          style={{
+            height: '100vh',
+            width: '100vw',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          Slack Reaction Overlay
+        </div>
+      </Page>
     );
   }
 }

@@ -1,7 +1,7 @@
-import React from "react";
-import anime from "animejs";
-import { withQuoraAudienceContext } from "../Shared/QuoraAudienceContext";
-import parse from "html-react-parser";
+import React from 'react';
+import anime from 'animejs';
+import parse from 'html-react-parser';
+import { withAudienceContext } from '../Shared/AudienceContext';
 
 interface ChatboxProps {
   messages: any[];
@@ -28,7 +28,7 @@ class ChatBox extends React.Component<ChatboxProps, ChatboxState> {
   private fadeIn() {
     return anime({
       targets: this.chatBoxRef.current,
-      easing: "easeInBack",
+      easing: 'easeInBack',
       duration: 1000,
       opacity: 1,
     });
@@ -37,7 +37,7 @@ class ChatBox extends React.Component<ChatboxProps, ChatboxState> {
   private fadeOut() {
     return anime({
       targets: this.chatBoxRef.current,
-      easing: "easeInBack",
+      easing: 'easeInBack',
       duration: 10000,
       opacity: 0,
     });
@@ -61,7 +61,7 @@ class ChatBox extends React.Component<ChatboxProps, ChatboxState> {
     while (tempMessage.match(/(:[^\s:]+:)/)) {
       const match: any = tempMessage.match(/(:[^\s:]+:)/);
       const token = match[0];
-      const key = token.split(":").join("");
+      const key = token.split(':').join('');
       const toRender = emojis[key]
         ? emojis[key]
         : quoraEmojis[key]
@@ -74,7 +74,7 @@ class ChatBox extends React.Component<ChatboxProps, ChatboxState> {
       tempMessage = tempMessage.replace(token, toRender);
     }
     return (
-      <div style={{ display: "flex", flexWrap: "wrap" }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
         {parse(tempMessage)}
       </div>
     );
@@ -88,12 +88,12 @@ class ChatBox extends React.Component<ChatboxProps, ChatboxState> {
           <div
             key={message.key}
             style={{
-              color: "white",
-              paddingBottom: "10px",
-              fontSize: "30px",
+              color: 'white',
+              paddingBottom: '10px',
+              fontSize: '30px',
               opacity: 1 / (i + 1),
-              transition: "all .5s ",
-              wordWrap: "break-word",
+              transition: 'all .5s ',
+              wordWrap: 'break-word',
             }}
           >
             {this.emojifyMessage(message.content)}
@@ -106,26 +106,26 @@ class ChatBox extends React.Component<ChatboxProps, ChatboxState> {
     return messages.length ? (
       <div
         style={{
-          position: "absolute",
+          position: 'absolute',
           bottom: 0,
-          height: "50vh",
-          width: "70vw",
-          overflowY: "hidden",
+          height: '50vh',
+          width: '70vw',
+          overflowY: 'hidden',
         }}
       >
         <div
           ref={this.chatBoxRef}
           style={{
-            padding: "15px",
-            paddingRight: "30px",
-            paddingLeft: "30px",
-            flexDirection: "column",
-            maxWidth: "70vw",
-            backgroundColor: "rgba(0,0,0,.8)",
-            borderRadius: "15px",
-            transition: "opcity 5s",
+            padding: '15px',
+            paddingRight: '30px',
+            paddingLeft: '30px',
+            flexDirection: 'column',
+            maxWidth: '70vw',
+            backgroundColor: 'rgba(0,0,0,.8)',
+            borderRadius: '15px',
+            transition: 'opcity 5s',
             opacity: 1,
-            position: "absolute",
+            position: 'absolute',
             bottom: 0,
           }}
         >
@@ -136,4 +136,4 @@ class ChatBox extends React.Component<ChatboxProps, ChatboxState> {
   }
 }
 
-export default withQuoraAudienceContext(ChatBox);
+export default withAudienceContext(ChatBox);

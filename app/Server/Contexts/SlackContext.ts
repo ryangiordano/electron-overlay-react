@@ -58,11 +58,20 @@ export const getLocalSlackData = (): Promise<LocalSlackTokens> => {
 };
 
 export default class SlackContext {
+  private channels = [];
+
+  public getCachedChannels(): any[] {
+    return this.channels;
+  }
+
   async initialize() {
     const localDataExists = await fileExists(localSlackURL());
     if (!localDataExists) {
       await createSlackDataFile();
     }
+    this.getChannels().then((channels) => {
+      this.channels = channels;
+    });
   }
 
   async buildWebClient() {
@@ -85,7 +94,18 @@ export default class SlackContext {
     return users;
   }
 
-  async getChannels(nextCursor?: string) {
+  private async getChannels(channels: any[] = [], nextCursor?: string): any {
+    const r: any = await this.getChannelsInner(nextCursor);
+    if (r?.channels?.length) {
+      channels.push(...r?.channels);
+    }
+    if (r?.response_metadata?.next_cursor) {
+      return this.getChannels(channels, r?.response_metadata?.next_cursor);
+    }
+    return channels;
+  }
+
+  async getChannelsInner(nextCursor?: string) {
     const webClient = await this.buildWebClient();
     const channels = await webClient?.conversations?.list({
       limit: 400,

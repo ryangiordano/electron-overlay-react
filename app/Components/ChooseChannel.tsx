@@ -47,13 +47,24 @@ const ChannelNavButton = ({
   );
 };
 
-export default class ChooseChannel extends React.Component<any, any> {
-  constructor(props: any) {
+interface ChooseChannelState {
+  channelName: string;
+  validChannel: boolean;
+  loading: boolean;
+  channels: any[];
+}
+interface ChooseChannelProps {}
+export default class ChooseChannel extends React.Component<
+  ChooseChannelProps,
+  ChooseChannelState
+> {
+  constructor(props: ChooseChannelProps) {
     super(props);
     this.state = {
       channelName: '',
       validChannel: false,
       loading: false,
+      channels: [],
     };
   }
 
@@ -73,6 +84,18 @@ export default class ChooseChannel extends React.Component<any, any> {
       loading: false,
     });
   }, 300);
+
+  componentDidMount() {
+    this.getChannels();
+  }
+
+  async getChannels() {
+    const d = await axios.get(`${serverUrl}/api/slack/channels/`);
+    console.log(d);
+    this.setState({
+      channels: d.data,
+    });
+  }
 
   private isValid() {
     const { validChannel, channelName, loading } = this.state;

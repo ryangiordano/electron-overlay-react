@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as express from 'express';
 import SlackContext from '../Contexts/SlackContext';
 import Slack from '../Services/Slack';
@@ -18,6 +19,14 @@ export default class SlackController {
     this.intializeRoutes();
   }
 
+  private async getChannels() {
+    const channels: any[] = await this.slackContext?.getCachedChannels();
+    return {
+      success: true,
+      channels: channels || [],
+    };
+  }
+
   public async initializeContext() {
     this.slackContext = new SlackContext();
     await this.slackContext.initialize();
@@ -25,9 +34,20 @@ export default class SlackController {
 
   public intializeRoutes() {
     this.router.get(`${this.path}/channels`, async (_request, response) => {
-      const channels = await this.slackContext?.getChannels();
+      const channels = await this.getChannels();
       return response.send(channels);
     });
+
+    this.router.get(
+      `${this.path}/channels/:searchString`,
+      async (request, response) => {
+        const { searchString } = request.params;
+
+        const { channels } = await this.getChannels();
+        const r = channels?.filter((c) => c.name.includes(searchString));
+        return response.send(r);
+      }
+    );
 
     this.router.get(
       `${this.path}/channels/:channelId`,
@@ -78,7 +98,10 @@ export default class SlackController {
     });
   }
 
-  private async getChannel(channelIdentifier: string, nextCursor?: string) {
+  private async getChannel(
+    channelIdentifier: string,
+    nextCursor?: string
+  ): any {
     const r: any = await this.slackContext?.getChannels(nextCursor);
     const channel = r?.channels.find(
       (c: any) => c.id === channelIdentifier || c.name === channelIdentifier

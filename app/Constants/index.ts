@@ -12,5 +12,5 @@ export const localSlackURL = () =>
 
 export const screenSize = {
   width: 550,
-  height: 400,
+  height: 450,
 };

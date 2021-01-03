@@ -62,7 +62,6 @@ interface ChooseChannelState {
   validChannel: boolean;
   loading: boolean;
   channels: any[];
-  selectedChannelObject?: any;
 }
 interface ChooseChannelProps {}
 export default class ChooseChannel extends React.Component<
@@ -76,7 +75,6 @@ export default class ChooseChannel extends React.Component<
       validChannel: false,
       loading: false,
       channels: [],
-      selectedChannelObject: undefined,
     };
   }
 
@@ -110,12 +108,7 @@ export default class ChooseChannel extends React.Component<
   }
 
   render() {
-    const {
-      validChannel,
-      channelName,
-      selectedChannelObject,
-      channels,
-    } = this.state;
+    const { validChannel, channelName, channels } = this.state;
     return (
       <div
         style={{
@@ -132,8 +125,6 @@ export default class ChooseChannel extends React.Component<
         </label>
         <div style={{ display: 'flex', position: 'relative' }}>
           <Select
-            value={selectedChannelObject}
-            inputValue={channelName}
             styles={{
               container: (base) => ({
                 ...base,
@@ -146,7 +137,6 @@ export default class ChooseChannel extends React.Component<
               if (actionMeta.action === 'select-option') {
                 this.setState(
                   {
-                    selectedChannelObject: selected,
                     loading: false,
                     channelName: selected?.value,
                   },
@@ -165,6 +155,7 @@ export default class ChooseChannel extends React.Component<
                   (prevState) => {
                     return {
                       ...prevState,
+                      selectedChannelObject: null,
                       channelName: value,
                       loading: true,
                     };

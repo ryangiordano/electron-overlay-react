@@ -44,12 +44,12 @@ export default class BrowserOverlayWindow {
         process.env.ERB_SECURE !== 'true'
           ? {
               nodeIntegration: true,
-              devTools: true,
+              devTools: false,
               enableRemoteModule: true,
             }
           : {
               preload: path.join(__dirname, '../dist/renderer.prod.js'),
-              devTools: true,
+              devTools: false,
               enableRemoteModule: true,
             },
     });

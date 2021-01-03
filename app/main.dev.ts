@@ -21,21 +21,21 @@ const overlayWindow = new BrowserOverlayWindow({ screenSize });
 
 app.disableHardwareAcceleration();
 
-const installExtensions = async () => {
-  const installer = require('electron-devtools-installer');
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
-  return Promise.all(
-    extensions.map((name) => installer.default(installer[name], forceDownload))
-  ).catch(console.log);
-};
+// const installExtensions = async () => {
+//   const installer = require('electron-devtools-installer');
+//   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+//   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+//   return Promise.all(
+//     extensions.map((name) => installer.default(installer[name], forceDownload))
+//   ).catch(console.log);
+// };
 
 const createWindow = async () => {
   if (
     process.env.NODE_ENV === 'development' ||
     process.env.DEBUG_PROD === 'true'
   ) {
-    await installExtensions();
+    // await installExtensions();
   }
 
   mainWindow = new BrowserWindow({
@@ -49,12 +49,12 @@ const createWindow = async () => {
       process.env.ERB_SECURE !== 'true'
         ? {
             nodeIntegration: true,
-            devTools: true,
+            devTools: false,
             enableRemoteModule: true,
           }
         : {
             preload: path.join(__dirname, 'dist/renderer.prod.js'),
-            devTools: true,
+            devTools: false,
             enableRemoteModule: true,
           },
   });

@@ -6,10 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { debounce } from 'lodash';
 import axios from 'axios';
 import { ipcRenderer } from 'electron';
-import TextInput from '../Patterns/Forms/TextInput';
 import { serverUrl } from '../Constants';
-import AsyncSelect from 'react-select/async';
-import InputSelect from 'react-select-input';
 import Select from 'react-select';
 const ChannelNavButton = ({
   validChannel,
@@ -182,70 +179,11 @@ export default class ChooseChannel extends React.Component<
             }}
             options={channels.map((c) => ({ value: c.name, label: c.name }))}
           />
-          {/* <TextInput
-            id="channel-id"
-            value={channelName}
-            onChange={(e: any) => {
-              this.setState(
-                { channelName: e.target.value, loading: true, channels: [] },
-                () => {
-                  this.searchChannels();
-                }
-              );
-            }}
-            placeholder="Enter a channel name or ID"
-          />
-          {channels.length ? (
-            <div
-              className=""
-              style={{
-                backgroundColor: 'white',
-                padding: '.5rem',
-                position: 'absolute',
-                border: '1px solid red',
-                top: '40px',
-                zIndex: 1,
-              }}
-            >
-              {channels.map((c) => {
-                return (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      this.setState({ channelName: c.name });
-                    }}
-                  >
-                    {c.name}
-                  </button>
-                );
-              })}
-            </div>
-          ) : null} */}
           <div>
             <ChannelNavButton
               validChannel={validChannel}
               channelName={channelName}
             />
-            {/* <div
-              className={`validation ${validChannel ? 'valid' : 'invalid'}`}
-              role="alert"
-              style={{
-                height: '1rem',
-                marginTop: '1rem',
-              }}
-            >
-              {this.isValid() ? (
-                <p className="text-success">Valid channel</p>
-              ) : null}
-              {!this.isValid() && !loading && channelName.length ? (
-                <p className="text-primary">
-                  Can&apos;t find this channel...
-                  <span aria-label="sad-face" role="img">
-                    😢
-                  </span>
-                </p>
-              ) : null}
-            </div> */}
           </div>
         </div>
       </div>

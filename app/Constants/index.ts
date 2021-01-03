@@ -11,6 +11,6 @@ export const localSlackURL = () =>
     : path.join(app?.getPath('userData'), `/local-slack-data.json`);
 
 export const screenSize = {
-  width: 1024,
-  height: 728,
+  width: 550,
+  height: 400,
 };

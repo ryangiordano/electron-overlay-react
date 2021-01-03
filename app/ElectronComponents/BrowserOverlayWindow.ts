@@ -18,10 +18,6 @@ export default class BrowserOverlayWindow {
   }
 
   public openWindow() {
-    console.log('browser window', this.browserWindow);
-    if (this.browserWindow) {
-      // this.closeWindow();
-    }
     this.createWindow();
   }
 
@@ -60,9 +56,9 @@ export default class BrowserOverlayWindow {
     this.browserWindow.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
     });
-    // this.browserWindow.setIgnoreMouseEvents(true);
-    // this.browserWindow.setAlwaysOnTop(true, 'floating');
-    // this.browserWindow.maximize();
+    this.browserWindow.setIgnoreMouseEvents(true);
+    this.browserWindow.setAlwaysOnTop(true, 'floating');
+    this.browserWindow.maximize();
 
     this.browserWindow.webContents.on('did-finish-load', () => {
       if (!this.browserWindow) {

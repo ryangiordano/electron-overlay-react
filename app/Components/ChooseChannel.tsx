@@ -100,18 +100,6 @@ export default class ChooseChannel extends React.Component<
     });
   }, 300);
 
-  componentDidMount() {
-    // this.getChannels();
-  }
-
-  // async getChannels() {
-  //   const d = await axios.get(`${serverUrl}/api/slack/channels/`);
-  //   console.log(d);
-  //   this.setState({
-  //     channels: d.data,
-  //   });
-  // }
-
   private async setChannelValidity() {
     const { channelName } = this.state;
     const response = await axios.get(
@@ -131,12 +119,6 @@ export default class ChooseChannel extends React.Component<
       selectedChannelObject,
       channels,
     } = this.state;
-    console.log(
-      selectedChannelObject,
-      channelName,
-      channels,
-      'State in render'
-    );
     return (
       <div
         style={{
@@ -152,58 +134,6 @@ export default class ChooseChannel extends React.Component<
           Channel to stream
         </label>
         <div style={{ display: 'flex', position: 'relative' }}>
-          {/* <AsyncSelect
-            onChange={(selected) => {
-              this.setState({ channelName: selected?.value || '' });
-            }}
-            onInputChange={(value) => {
-              this.setState({ channelName: value });
-            }}
-            loadOptions={() => {
-              return new Promise((resolve) => {
-                console.log(
-                  channels.map((c) => ({ value: c.name, label: c.name }))
-                );
-                resolve(
-                  channels.map((c) => ({ value: c.name, label: c.name }))
-                );
-              });
-            }}
-          /> */}
-          {/* <InputSelect
-            onSelect={(option) => {
-              this.setState({
-                selectedChannelObject: option,
-                loading: false,
-                channelName: option.value,
-              });
-            }}
-            value={channelName}
-            clearable={false}
-            onChange={(event) => {
-              const value = event?.target?.value;
-              console.log(event?.target?.value, value);
-              this.setState(
-                (prevState) => {
-                  console.log(value);
-
-                  return {
-                    ...prevState,
-                    channelName: value ?? '',
-                    loading: true,
-                  };
-                },
-                () => {
-                  this.searchChannels();
-                }
-              );
-            }}
-            collapseOnEscape
-            collapseOnSelect
-            collapseOnBlur
-            options={channels.map((c) => ({ value: c.name, label: c.name }))}
-          />
-          <br /> */}
           <Select
             value={selectedChannelObject}
             inputValue={channelName}

@@ -69,9 +69,8 @@ export default class SlackContext {
     if (!localDataExists) {
       await createSlackDataFile();
     }
-    this.getChannels().then((channels) => {
+    this.getChannels().then((channels: any) => {
       this.channels = channels;
-      console.log(channels)
     });
   }
 

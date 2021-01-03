@@ -44,10 +44,11 @@ export default class SlackService {
    */
   async getChannel(channelName: string) {
     const channel = this.endPoint
-      ? await axios.get(`${this.endPoint}/slack/channels/channel/${channelName}`)
+      ? await axios.get(
+          `${this.endPoint}/slack/channels/channel/${channelName}`
+        )
       : null;
     const data = await channel?.data;
-    console.log('get channel', channel);
     return data?.channel;
   }
 

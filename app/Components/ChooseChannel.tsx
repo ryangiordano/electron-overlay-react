@@ -8,7 +8,9 @@ import axios from 'axios';
 import { ipcRenderer } from 'electron';
 import TextInput from '../Patterns/Forms/TextInput';
 import { serverUrl } from '../Constants';
-
+import AsyncSelect from 'react-select/async';
+import InputSelect from 'react-select-input';
+import Select from 'react-select';
 const ChannelNavButton = ({
   validChannel,
   channelName,
@@ -30,6 +32,7 @@ const ChannelNavButton = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
     <button
       type="button"
@@ -38,11 +41,21 @@ const ChannelNavButton = ({
         whiteSpace: 'nowrap',
         marginLeft: '1rem',
       }}
+      disabled={!validChannel}
       onClick={() => {
-        ipcRenderer.send('open-overlay', { id: channelName });
+        validChannel && ipcRenderer.send('open-overlay', { id: channelName });
       }}
     >
-      {validChannel ? `Stream from ${channelName}` : `Enter channel`}
+      {validChannel ? (
+        <>
+          Stream from {channelName}{' '}
+          <span aria-label="thumbs-up" role="img">
+            👍
+          </span>
+        </>
+      ) : (
+        `Enter channel`
+      )}
     </button>
   );
 };
@@ -52,6 +65,7 @@ interface ChooseChannelState {
   validChannel: boolean;
   loading: boolean;
   channels: any[];
+  selectedChannelObject?: any;
 }
 interface ChooseChannelProps {}
 export default class ChooseChannel extends React.Component<
@@ -65,10 +79,11 @@ export default class ChooseChannel extends React.Component<
       validChannel: false,
       loading: false,
       channels: [],
+      selectedChannelObject: undefined,
     };
   }
 
-  getChannel = debounce(async () => {
+  searchChannels = debounce(async () => {
     const { channelName } = this.state;
 
     if (!channelName.length) {
@@ -78,33 +93,50 @@ export default class ChooseChannel extends React.Component<
       `${serverUrl}/api/slack/channels/${channelName}`
     );
     const data = await response?.data;
-    const valid = Boolean(data?.success);
+    this.setChannelValidity();
     return this.setState({
-      validChannel: valid,
       loading: false,
+      channels: data.channels,
     });
   }, 300);
 
   componentDidMount() {
-    this.getChannels();
+    // this.getChannels();
   }
 
-  async getChannels() {
-    const d = await axios.get(`${serverUrl}/api/slack/channels/`);
-    console.log(d);
-    this.setState({
-      channels: d.data,
+  // async getChannels() {
+  //   const d = await axios.get(`${serverUrl}/api/slack/channels/`);
+  //   console.log(d);
+  //   this.setState({
+  //     channels: d.data,
+  //   });
+  // }
+
+  private async setChannelValidity() {
+    const { channelName } = this.state;
+    const response = await axios.get(
+      `${serverUrl}/api/slack/channels/${channelName}`
+    );
+    return this.setState({
+      validChannel: !!response?.data?.channels?.find(
+        (c: any) => c.name === channelName
+      ),
     });
   }
 
-  private isValid() {
-    const { validChannel, channelName, loading } = this.state;
-
-    return !loading && channelName.length && validChannel;
-  }
-
   render() {
-    const { validChannel, channelName, loading } = this.state;
+    const {
+      validChannel,
+      channelName,
+      selectedChannelObject,
+      channels,
+    } = this.state;
+    console.log(
+      selectedChannelObject,
+      channelName,
+      channels,
+      'State in render'
+    );
     return (
       <div
         style={{
@@ -115,54 +147,176 @@ export default class ChooseChannel extends React.Component<
         <label
           className="card-title"
           htmlFor="channel-id"
-          style={{ fontSize: '1.5rem' }}
+          style={{ fontSize: '1.2rem' }}
         >
           Channel to stream
         </label>
-        <div style={{ display: 'flex' }}>
-          <TextInput
+        <div style={{ display: 'flex', position: 'relative' }}>
+          {/* <AsyncSelect
+            onChange={(selected) => {
+              this.setState({ channelName: selected?.value || '' });
+            }}
+            onInputChange={(value) => {
+              this.setState({ channelName: value });
+            }}
+            loadOptions={() => {
+              return new Promise((resolve) => {
+                console.log(
+                  channels.map((c) => ({ value: c.name, label: c.name }))
+                );
+                resolve(
+                  channels.map((c) => ({ value: c.name, label: c.name }))
+                );
+              });
+            }}
+          /> */}
+          {/* <InputSelect
+            onSelect={(option) => {
+              this.setState({
+                selectedChannelObject: option,
+                loading: false,
+                channelName: option.value,
+              });
+            }}
+            value={channelName}
+            clearable={false}
+            onChange={(event) => {
+              const value = event?.target?.value;
+              console.log(event?.target?.value, value);
+              this.setState(
+                (prevState) => {
+                  console.log(value);
+
+                  return {
+                    ...prevState,
+                    channelName: value ?? '',
+                    loading: true,
+                  };
+                },
+                () => {
+                  this.searchChannels();
+                }
+              );
+            }}
+            collapseOnEscape
+            collapseOnSelect
+            collapseOnBlur
+            options={channels.map((c) => ({ value: c.name, label: c.name }))}
+          />
+          <br /> */}
+          <Select
+            value={selectedChannelObject}
+            inputValue={channelName}
+            styles={{
+              container: (base) => ({
+                ...base,
+                display: 'flex',
+                width: '100%',
+              }),
+              control: (base) => ({ ...base, display: 'flex', width: '100%' }),
+            }}
+            onChange={(selected, actionMeta) => {
+              if (actionMeta.action === 'select-option') {
+                this.setState(
+                  {
+                    selectedChannelObject: selected,
+                    loading: false,
+                    channelName: selected?.value,
+                  },
+                  () => {
+                    this.setChannelValidity();
+                  }
+                );
+              }
+            }}
+            onBlur={() => {
+              return;
+            }}
+            onInputChange={(value, actionMeta) => {
+              if (actionMeta.action === 'input-change') {
+                this.setState(
+                  (prevState) => {
+                    return {
+                      ...prevState,
+                      channelName: value,
+                      loading: true,
+                    };
+                  },
+                  () => {
+                    this.setChannelValidity();
+                    this.searchChannels();
+                  }
+                );
+              }
+              // conditionally set state if value is not the same as prev state's channelName
+            }}
+            options={channels.map((c) => ({ value: c.name, label: c.name }))}
+          />
+          {/* <TextInput
             id="channel-id"
             value={channelName}
             onChange={(e: any) => {
               this.setState(
-                { channelName: e.target.value, loading: true },
+                { channelName: e.target.value, loading: true, channels: [] },
                 () => {
-                  this.getChannel();
+                  this.searchChannels();
                 }
               );
             }}
             placeholder="Enter a channel name or ID"
           />
-          <ChannelNavButton
-            validChannel={validChannel}
-            channelName={channelName}
-          />
-        </div>
-
-        <div
-          className={`validation ${validChannel ? 'valid' : 'invalid'}`}
-          role="alert"
-          style={{
-            height: '1rem',
-            marginTop: '1rem',
-          }}
-        >
-          {this.isValid() ? (
-            <p className="text-success">
-              We&apos;re good to use this channel
-              <span aria-label="thumbs-up" role="img">
-                👍
-              </span>
-            </p>
-          ) : null}
-          {!this.isValid() && !loading && channelName.length ? (
-            <p className="text-primary">
-              Sorry, we can&apos;t find this channel...
-              <span aria-label="sad-face" role="img">
-                😢
-              </span>
-            </p>
-          ) : null}
+          {channels.length ? (
+            <div
+              className=""
+              style={{
+                backgroundColor: 'white',
+                padding: '.5rem',
+                position: 'absolute',
+                border: '1px solid red',
+                top: '40px',
+                zIndex: 1,
+              }}
+            >
+              {channels.map((c) => {
+                return (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      this.setState({ channelName: c.name });
+                    }}
+                  >
+                    {c.name}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null} */}
+          <div>
+            <ChannelNavButton
+              validChannel={validChannel}
+              channelName={channelName}
+            />
+            {/* <div
+              className={`validation ${validChannel ? 'valid' : 'invalid'}`}
+              role="alert"
+              style={{
+                height: '1rem',
+                marginTop: '1rem',
+              }}
+            >
+              {this.isValid() ? (
+                <p className="text-success">Valid channel</p>
+              ) : null}
+              {!this.isValid() && !loading && channelName.length ? (
+                <p className="text-primary">
+                  Can&apos;t find this channel...
+                  <span aria-label="sad-face" role="img">
+                    😢
+                  </span>
+                </p>
+              ) : null}
+            </div> */}
+          </div>
         </div>
       </div>
     );

@@ -20,7 +20,8 @@ export default class SlackController {
   }
 
   private async getChannels() {
-    const channels: any[] = await this.slackContext?.getCachedChannels();
+    const channels: any[] =
+      (await this.slackContext?.getCachedChannels()) ?? [];
     return {
       success: true,
       channels: channels || [],
@@ -38,6 +39,7 @@ export default class SlackController {
       return response.send(channels);
     });
 
+    /** Search through the cached channels for channels that contain the search parameter */
     this.router.get(
       `${this.path}/channels/:searchString`,
       async (request, response) => {
@@ -45,12 +47,16 @@ export default class SlackController {
 
         const { channels } = await this.getChannels();
         const r = channels?.filter((c) => c.name.includes(searchString));
-        return response.send(r);
+        return response.send({
+          success: true,
+          channels: r,
+        });
       }
     );
 
+    /** Get a single channel by the channel name/id */
     this.router.get(
-      `${this.path}/channels/:channelId`,
+      `${this.path}/channels/channel/:channelId`,
       async (request, response) => {
         const channelIdentifier = request.params.channelId;
         const responseObject = await this.getChannel(channelIdentifier);
@@ -98,13 +104,10 @@ export default class SlackController {
     });
   }
 
-  private async getChannel(
-    channelIdentifier: string,
-    nextCursor?: string
-  ): any {
-    const r: any = await this.slackContext?.getChannels(nextCursor);
-    const channel = r?.channels.find(
-      (c: any) => c.id === channelIdentifier || c.name === channelIdentifier
+  private async getChannel(channelIdentifier: string): any {
+    const { channels } = await this.getChannels();
+    const channel = channels.find(
+      (c) => c.name === channelIdentifier || c.id === channelIdentifier
     );
     if (channel) {
       return {
@@ -112,15 +115,9 @@ export default class SlackController {
         channel,
       };
     }
-    if (r?.response_metadata?.next_cursor) {
-      return this.getChannel(
-        channelIdentifier,
-        r?.response_metadata?.next_cursor
-      );
-    }
     return {
-      error: 'This channel does not exist.',
       success: false,
+      message: `Channel: ${channelIdentifier} not found`,
     };
   }
 

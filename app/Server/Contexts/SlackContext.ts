@@ -71,6 +71,7 @@ export default class SlackContext {
     }
     this.getChannels().then((channels) => {
       this.channels = channels;
+      console.log(channels)
     });
   }
 

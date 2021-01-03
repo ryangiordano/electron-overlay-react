@@ -78,7 +78,7 @@ export default class AudiencePage extends React.Component<
     await this.fetchUsers();
     const { match } = this.props;
     const channel = await this.slackService.getChannel(match.params.channelId);
-
+    console.log(match.params.channelId, match, channel);
     this.setState({ focusChannel: channel });
   }
 
@@ -173,8 +173,10 @@ export default class AudiencePage extends React.Component<
 
   private handleWebsocketMessage(event: SlackEvent) {
     const { focusChannel } = this.state;
+    console.log(event);
     if (event?.type === 'reaction_added') {
       const channelId = event.item.channel;
+      console.log(focusChannel, channelId);
       if (focusChannel?.id === channelId) {
         this.addReaction(event?.reaction);
       }

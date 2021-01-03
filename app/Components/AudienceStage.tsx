@@ -11,6 +11,7 @@ const AudienceStage = ({
   reactions: any[];
   messages: any[];
 }) => {
+  console.log(reactions, messages)
   return (
     <div
       style={{

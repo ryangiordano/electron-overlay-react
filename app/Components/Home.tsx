@@ -69,12 +69,12 @@ class Home extends React.Component<HomeProps, HomeState> {
                   <Card header="Streaming Reaction Overlay" className="mt-3">
                     <ChooseChannel />
                   </Card>
-                  <Card
+                  {/* <Card
                     header="Find others in the company who are looking for conversation partners"
                     className="my-3"
                   >
                     <ChatQueue users={users} />
-                  </Card>
+                  </Card> */}
                   <Card header="Re-register your slackbot tokens.">
                     <button
                       type="button"

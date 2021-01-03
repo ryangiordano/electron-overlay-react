@@ -18,7 +18,10 @@ export default class BrowserOverlayWindow {
   }
 
   public openWindow() {
-    this.closeWindow();
+    console.log('browser window', this.browserWindow);
+    if (this.browserWindow) {
+      // this.closeWindow();
+    }
     this.createWindow();
   }
 
@@ -45,21 +48,21 @@ export default class BrowserOverlayWindow {
         process.env.ERB_SECURE !== 'true'
           ? {
               nodeIntegration: true,
-              devTools: false,
+              devTools: true,
               enableRemoteModule: true,
             }
           : {
               preload: path.join(__dirname, '../dist/renderer.prod.js'),
-              devTools: false,
+              devTools: true,
               enableRemoteModule: true,
             },
     });
     this.browserWindow.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
     });
-    this.browserWindow.setIgnoreMouseEvents(true);
-    this.browserWindow.setAlwaysOnTop(true, 'floating');
-    this.browserWindow.maximize();
+    // this.browserWindow.setIgnoreMouseEvents(true);
+    // this.browserWindow.setAlwaysOnTop(true, 'floating');
+    // this.browserWindow.maximize();
 
     this.browserWindow.webContents.on('did-finish-load', () => {
       if (!this.browserWindow) {
@@ -78,7 +81,9 @@ export default class BrowserOverlayWindow {
   }
 
   public closeWindow() {
-    this.browserWindow?.close();
+    if (this.browserWindow?.isClosable) {
+      this.browserWindow?.close();
+    }
     this.browserWindow = undefined;
   }
 }

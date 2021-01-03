@@ -82,8 +82,7 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  globalShortcut.register('CommandOrControl+Esc', () => {
-    app.dock.show();
+  globalShortcut.register('Shift+Esc', () => {
     overlayWindow?.closeWindow();
   });
 };
@@ -154,8 +153,4 @@ ipcMain.on('open-overlay', (_event, { id }) => {
       overlayWindow.send('navigate', { route: 'channel', id });
     }, 1000);
   });
-});
-
-ipcMain.on('close-overlay', () => {
-  overlayWindow.closeWindow();
 });

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Navbar = () => {
   return (
-    <div style={{ paddingBottom: '5rem' }}>
+    <div style={{ paddingBottom: '3rem' }}>
       <nav
         className="navbar navbar-light bg-light"
         style={{
@@ -12,9 +12,18 @@ const Navbar = () => {
           flexWrap: 'nowrap',
           width: '100%',
           zIndex: 1000,
+          alignItems: "center"
         }}
       >
-        <h1 style={{ whiteSpace: 'nowrap' }} className="mr-3">
+        <h1
+          style={{
+            whiteSpace: 'nowrap',
+            fontSize: '1.5rem',
+            margin: 0,
+            padding: 0,
+          }}
+          className="mr-3"
+        >
           Slack Overlay
         </h1>
       </nav>

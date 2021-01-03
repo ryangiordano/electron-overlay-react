@@ -34,7 +34,6 @@ export default class Slack {
     });
     this.wss.on('connection', (ws: any) => {
       const uid = new Date().toString();
-
       this.clientSockets.set(uid, ws);
 
       ws.on('close', () => {

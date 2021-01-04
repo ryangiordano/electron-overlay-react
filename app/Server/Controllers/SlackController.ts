@@ -155,6 +155,9 @@ export default class SlackController {
   public async createSlackWebsocketConnection() {
     const credentials = await this.getLocalCredentials();
     if (credentials?.slackbotToken) {
+      if(this.slack){
+        this.slack.tearDown();
+      }
       this.slack = new Slack(credentials?.slackbotToken);
       this.slack.initialize();
     }

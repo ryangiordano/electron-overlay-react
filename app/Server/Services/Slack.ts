@@ -51,6 +51,15 @@ export default class Slack {
     await this.slackEvents.start();
   }
 
+  public tearDown() {
+    this.slackEvents.off('reaction_added', (d) => this.handleReactionAdded(d));
+
+    this.slackEvents.off('message', (d) => this.handleMessage(d));
+
+    this.slackEvents.off('user_change', (d) => this.handleUserChange(d));
+    this.wss.close();
+  }
+
   private handleReactionAdded(data: any) {
     if (this.clientSockets.size) {
       this.clientSockets?.forEach((ws) => {

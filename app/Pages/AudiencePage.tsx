@@ -133,7 +133,8 @@ export default class AudiencePage extends React.Component<
       switch (formatType) {
         case '@': {
           // Format user @mentions if the user exists in our cache.
-          return this.users[content] ? `@${this.users[content].name}` : match;
+          const user = this.users.find((u: any) => u.id === content);
+          return user ? `@${user.name}` : `@${content}`;
         }
         case '!': {
           // Format special mentions like @here.
@@ -159,7 +160,7 @@ export default class AudiencePage extends React.Component<
     this.setState((prevState) => {
       prevState.messages.unshift({
         key: `${Date.now() / 100}`,
-        content: userName ? `${userName}: ${n}` : n,
+        content: userName ? `${userName}: ${n}` : `${n}`,
       });
       if (prevState.messages.length > 6) {
         prevState.messages.splice(6);

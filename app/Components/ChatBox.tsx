@@ -107,10 +107,10 @@ class ChatBox extends React.Component<ChatboxProps, ChatboxState> {
       <div
         style={{
           position: 'absolute',
-          bottom: 0,
           height: '50vh',
           width: '70vw',
           overflowY: 'hidden',
+          bottom: '15%',
         }}
       >
         <div

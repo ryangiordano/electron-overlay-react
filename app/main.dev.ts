@@ -22,23 +22,7 @@ const overlayWindow = new BrowserOverlayWindow({ screenSize });
 
 app.disableHardwareAcceleration();
 
-// const installExtensions = async () => {
-//   const installer = require('electron-devtools-installer');
-//   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-//   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
-//   return Promise.all(
-//     extensions.map((name) => installer.default(installer[name], forceDownload))
-//   ).catch(console.log);
-// };
-
 const createWindow = async () => {
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_PROD === 'true'
-  ) {
-    // await installExtensions();
-  }
-
   mainWindow = new BrowserWindow({
     width: screenSize.width,
     height: screenSize.height,
@@ -80,14 +64,11 @@ const createWindow = async () => {
     const slackController = new SlackController();
     slackController.initializeContext();
     const validTokens = await slackController.hasValidTokens();
-    setTimeout(() => {
-      if (validTokens) {
-        console.log('Valid');
-        mainWindow?.webContents.send('navigate', { route: 'home' });
-      } else {
-        mainWindow?.webContents.send('navigate', { route: 'register' });
-      }
-    }, 3000);
+    if (validTokens) {
+      mainWindow?.webContents.send('navigate', { route: 'home' });
+    } else {
+      mainWindow?.webContents.send('navigate', { route: 'register' });
+    }
   });
 
   mainWindow.on('closed', () => {

@@ -189,6 +189,8 @@ export default class AudiencePage extends React.Component<
 
   render() {
     const { reactions, messages } = this.state;
+    const { match } = this.props;
+
     return (
       <WebSocketComponent
         url="localhost:5003"
@@ -203,6 +205,17 @@ export default class AudiencePage extends React.Component<
           <AudienceContext.Provider
             value={{ emojis: EmojiShortnameDict, quoraEmojis: this.emojis }}
           >
+            <h1
+              className="fade-out"
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '40%',
+                fontWeight: 'bold',
+              }}
+            >
+              Now Streaming {match.params.channelId}
+            </h1>
             <AudienceStage
               reactions={reactions}
               onRemove={() => this.clearReactions()}

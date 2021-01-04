@@ -1,5 +1,5 @@
-import React from "react";
-import anime from "animejs";
+import React from 'react';
+import anime from 'animejs';
 
 export class StreamingComponent extends React.Component<any, any> {
   private mounted = false;
@@ -27,7 +27,7 @@ export class StreamingComponent extends React.Component<any, any> {
       return this.anime({
         targets: this.emoteRef.current,
         scale: 6.5,
-        easing: "easeOutElastic",
+        easing: 'easeOutElastic',
         duration: 1000,
         opacity: 1,
       });
@@ -36,11 +36,11 @@ export class StreamingComponent extends React.Component<any, any> {
     const float = () => {
       return this.anime({
         targets: this.emoteRef.current,
-        translateY: "-100vh",
+        translateY: '-100vh',
         opacity: 0,
         duration: this.duration,
         scale: 8,
-        easing: "easeInOutExpo",
+        easing: 'easeInOutExpo',
       });
     };
 
@@ -62,9 +62,9 @@ export class StreamingComponent extends React.Component<any, any> {
       <div
         ref={this.emoteRef}
         style={{
-          bottom: "100px",
+          bottom: '100px',
           left: this.state.offsetX,
-          position: "absolute",
+          position: 'absolute',
         }}
       >
         {children}

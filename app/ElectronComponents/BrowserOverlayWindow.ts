@@ -21,6 +21,10 @@ export default class BrowserOverlayWindow {
     this.createWindow();
   }
 
+  public getBrowserWindow() {
+    return this.browserWindow;
+  }
+
   public loadURL(url: string) {
     return this.browserWindow?.loadURL(url, {});
   }
@@ -29,6 +33,12 @@ export default class BrowserOverlayWindow {
     this.browserWindow?.webContents.send(eventName, data);
   }
 
+  public hide() {
+    this.browserWindow?.hide();
+  }
+  public show() {
+    this.browserWindow?.show();
+  }
   private createWindow() {
     this.browserWindow = new BrowserWindow({
       width: this.screenSize.width,

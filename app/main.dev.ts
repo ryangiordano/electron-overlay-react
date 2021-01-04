@@ -15,6 +15,7 @@ import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron';
 import { createServer } from './Server/Server';
 import { screenSize } from './Constants';
 import BrowserOverlayWindow from './ElectronComponents/BrowserOverlayWindow';
+import SlackController from './Server/Controllers/SlackController';
 
 let mainWindow: BrowserWindow | null = null;
 const overlayWindow = new BrowserOverlayWindow({ screenSize });
@@ -63,7 +64,7 @@ const createWindow = async () => {
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
-  mainWindow.webContents.on('did-finish-load', () => {
+  mainWindow.webContents.on('did-finish-load', async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
@@ -76,6 +77,17 @@ const createWindow = async () => {
 
       mainWindow.focus();
     }
+    const slackController = new SlackController();
+    slackController.initializeContext();
+    const validTokens = await slackController.hasValidTokens();
+    setTimeout(() => {
+      if (validTokens) {
+        console.log('Valid');
+        mainWindow?.webContents.send('navigate', { route: 'home' });
+      } else {
+        mainWindow?.webContents.send('navigate', { route: 'register' });
+      }
+    }, 3000);
   });
 
   mainWindow.on('closed', () => {
@@ -147,10 +159,12 @@ app.on('activate', () => {
 // ===================================================
 ipcMain.on('open-overlay', (_event, { id }) => {
   overlayWindow.openWindow();
+  overlayWindow.hide();
+
   overlayWindow.loadURL(`file://${__dirname}/app.html`)?.then(() => {
     // TODO(rgiordano): Think of a more elegant solution for this:
     setTimeout(() => {
       overlayWindow.send('navigate', { route: 'channel', id });
-    }, 1000);
+    }, 500);
   });
 });

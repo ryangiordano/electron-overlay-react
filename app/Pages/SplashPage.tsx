@@ -1,7 +1,7 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import SlackService from '../Services/SlackService';
 import Page from './Page';
+import { ipcRenderer } from 'electron';
 
 type SplashPageProps = RouteComponentProps;
 
@@ -10,21 +10,16 @@ type SplashPageProps = RouteComponentProps;
  * tokens.
  */
 class SplashPage extends React.Component<SplashPageProps> {
-  private slackService: SlackService;
-
   constructor(props: SplashPageProps) {
     super(props);
-    this.slackService = new SlackService();
   }
 
   async componentDidMount() {
     const { history } = this.props;
-    const hasValidTokens = await this.slackService.hasValidTokens();
-    if (hasValidTokens) {
-      history.push('/home');
-    } else {
-      history.push('/register');
-    }
+    // Abstract this away into its own component
+    ipcRenderer.on('navigate', (_event, { route, id }) => {
+      history.push(`/${route}/${id}`);
+    });
   }
 
   render() {
